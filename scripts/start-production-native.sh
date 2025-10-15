@@ -47,7 +47,7 @@ echo "端口: $PORT"
 echo ""
 
 # 使用PM2启动
-pm2 start ecosystem.config.js --env production
+pm2 start ecosystem.config.cjs --env production
 
 # 显示状态
 echo -e "${BLUE}📊 应用状态:${NC}"

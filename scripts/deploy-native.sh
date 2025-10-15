@@ -65,7 +65,15 @@ pm2 delete "$APP_NAME" || true
 
 # 启动应用
 echo -e "${YELLOW}🚀 启动应用...${NC}"
-pm2 start ecosystem.config.js --env production
+# 优先使用.cjs文件，如果不存在则使用.mjs
+if [ -f "ecosystem.config.cjs" ]; then
+    pm2 start ecosystem.config.cjs --env production
+elif [ -f "ecosystem.config.mjs" ]; then
+    pm2 start ecosystem.config.mjs --env production
+else
+    echo -e "${RED}❌ PM2配置文件不存在${NC}"
+    exit 1
+fi
 pm2 save
 
 # 等待服务启动

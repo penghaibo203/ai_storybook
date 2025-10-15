@@ -83,7 +83,7 @@ pm2 delete "$APP_NAME" || true
 
 # 启动应用
 echo -e "${YELLOW}🚀 启动应用...${NC}"
-pm2 start ecosystem.config.js --env production
+pm2 start ecosystem.config.cjs --env production
 pm2 save
 
 # 等待服务启动

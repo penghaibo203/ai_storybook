@@ -21,8 +21,8 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "blob:"],
-      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
       connectSrc: ["'self'", "https://api.coze.cn"],
@@ -30,16 +30,29 @@ app.use(helmet({
       workerSrc: ["'self'", "blob:"],
       childSrc: ["'self'", "blob:"]
     }
-  }
+  },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  originAgentCluster: false
 }));
 
 // CORS配置
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-domain.com'] 
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    ? ['https://hypersmart.work', 'https://www.hypersmart.work', 'https://129.226.121.30:3000'] 
+    : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://129.226.121.30:3000'],
   credentials: true
 }));
+
+// HTTPS重定向中间件（生产环境）
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(`https://${req.header('host')}${req.url}`);
+    } else {
+      next();
+    }
+  });
+}
 
 // 压缩中间件
 app.use(compression());
@@ -51,6 +64,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // 静态文件服务
 app.use(express.static(path.join(__dirname), {
   maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0',
+  etag: true,
+  lastModified: true
+}));
+
+// 专门的public目录服务
+app.use('/css', express.static(path.join(__dirname, 'public', 'css'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1y' : '0',
   etag: true,
   lastModified: true
 }));

@@ -3,7 +3,7 @@ import { CozeAPI } from '@coze/api';
 
 // API配置
 const API_CONFIG = {
-    token: (typeof process !== 'undefined' && process.env?.COZE_API_TOKEN) || 'pat_sj5hkCkL0OyXnKi9lHiRu45imOXeUa3qWO9xPBeL1If0AogxpHir1DCTBfvo1c6v',
+    token: (typeof process !== 'undefined' && process.env?.COZE_API_TOKEN) || 'your_coze_api_token_here',
     baseURL: (typeof process !== 'undefined' && process.env?.COZE_BASE_URL) || 'https://api.coze.cn',
     workflowId: (typeof process !== 'undefined' && process.env?.COZE_WORKFLOW_ID) || '7561291747888807978',
     timeout: 60000 // 60秒超时

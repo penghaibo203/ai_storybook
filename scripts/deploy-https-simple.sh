@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# HTTPS部署脚本
-# 用于部署AI英文绘本应用到生产环境
+# 简化HTTPS部署脚本
+# 适用于已有SSL证书的情况
 
 set -e
 
@@ -17,7 +17,7 @@ DOMAIN="hypersmart.work"
 APP_NAME="ai-storybook"
 DOCKER_COMPOSE_FILE="docker-compose.https.yml"
 
-echo -e "${GREEN}🚀 AI英文绘本应用 - HTTPS部署脚本${NC}"
+echo -e "${GREEN}🚀 AI英文绘本应用 - 简化HTTPS部署${NC}"
 echo "=============================================="
 
 # 检查Docker是否安装
@@ -42,16 +42,22 @@ fi
 # 检查SSL证书
 echo -e "${YELLOW}🔐 检查SSL证书...${NC}"
 if [ ! -f "ssl/hypersmart.work_bundle.crt" ] || [ ! -f "ssl/hypersmart.work.key" ]; then
-    echo -e "${YELLOW}⚠️  SSL证书不存在，请先运行证书生成脚本...${NC}"
-    echo "请以普通用户权限运行: ./scripts/generate-ssl.sh"
-    echo "或者手动将证书文件放置在:"
+    echo -e "${RED}❌ SSL证书文件不存在${NC}"
+    echo "请确保以下文件存在:"
     echo "  - ssl/hypersmart.work_bundle.crt"
     echo "  - ssl/hypersmart.work.key"
-    read -p "是否继续部署? (y/n): " continue_deploy
-    if [[ ! $continue_deploy =~ ^[Yy]$ ]]; then
-        echo -e "${RED}❌ 部署已取消${NC}"
-        exit 1
-    fi
+    echo ""
+    echo "如需生成证书，请运行:"
+    echo "  ./scripts/generate-ssl.sh"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ SSL证书文件存在${NC}"
+
+# 检查Docker Compose文件
+if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
+    echo -e "${RED}❌ Docker Compose文件不存在: $DOCKER_COMPOSE_FILE${NC}"
+    exit 1
 fi
 
 # 停止现有容器
@@ -113,34 +119,4 @@ echo "  资源使用: docker stats"
 echo "  Nginx日志: docker logs ai-storybook-nginx"
 echo ""
 
-# 设置自动重启（可选）
-read -p "是否设置系统启动时自动启动服务? (y/n): " auto_start
-if [[ $auto_start =~ ^[Yy]$ ]]; then
-    echo -e "${YELLOW}🔧 设置自动启动...${NC}"
-    
-    # 创建systemd服务文件
-    sudo tee /etc/systemd/system/ai-storybook.service > /dev/null << EOF
-[Unit]
-Description=AI Storybook Application
-Requires=docker.service
-After=docker.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=$(pwd)
-ExecStart=/usr/bin/docker-compose -f $(pwd)/$DOCKER_COMPOSE_FILE up -d
-ExecStop=/usr/bin/docker-compose -f $(pwd)/$DOCKER_COMPOSE_FILE down
-TimeoutStartSec=0
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    sudo systemctl daemon-reload
-    sudo systemctl enable ai-storybook.service
-    
-    echo -e "${GREEN}✅ 自动启动已配置${NC}"
-fi
-
-echo -e "${GREEN}🎊 部署脚本执行完成！${NC}"
+echo -e "${GREEN}🎊 简化HTTPS部署完成！${NC}"

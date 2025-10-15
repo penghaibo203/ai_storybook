@@ -22,9 +22,15 @@ echo "=================================="
 
 # 检查是否以root权限运行
 if [[ $EUID -eq 0 ]]; then
-   echo -e "${RED}❌ 请不要以root权限运行此脚本${NC}"
-   echo "请使用普通用户权限运行，脚本会在需要时请求sudo权限"
-   exit 1
+   echo -e "${YELLOW}⚠️  检测到以root权限运行${NC}"
+   echo "建议使用普通用户权限运行，脚本会在需要时请求sudo权限"
+   echo "继续运行可能导致权限问题"
+   read -p "是否继续? (y/n): " continue_as_root
+   if [[ ! $continue_as_root =~ ^[Yy]$ ]]; then
+       echo -e "${RED}❌ 脚本已取消${NC}"
+       exit 1
+   fi
+   echo -e "${YELLOW}⚠️  以root权限继续运行...${NC}"
 fi
 
 # 创建SSL目录

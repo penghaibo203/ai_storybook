@@ -20,13 +20,23 @@
 
 ## 快速开始
 
-### 1. 安装依赖
+### 1. 环境检查
+
+```bash
+# 检查部署环境
+./scripts/check-environment.sh
+
+# 快速部署（交互式）
+./scripts/quick-deploy.sh
+```
+
+### 2. 安装依赖
 
 ```bash
 npm install
 ```
 
-### 2. 配置环境变量
+### 3. 配置环境变量
 
 创建 `.env` 文件并配置以下变量：
 
@@ -41,7 +51,7 @@ PORT=3000
 NODE_ENV=development
 ```
 
-### 3. 启动应用
+### 4. 启动应用
 
 ```bash
 # 开发模式
@@ -51,9 +61,19 @@ npm run dev
 npm start
 ```
 
-### 4. 访问应用
+### 5. 访问应用
 
 打开浏览器访问 `http://localhost:3000`
+
+## 📚 详细部署文档
+
+查看 [DEPLOYMENT.md](./DEPLOYMENT.md) 获取完整的部署指南，包括：
+- 开发环境部署
+- 生产环境部署  
+- HTTPS部署
+- Docker部署
+- Vercel部署
+- 故障排除
 
 ## API配置说明
 

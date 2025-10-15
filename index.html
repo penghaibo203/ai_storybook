@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI英文绘本 - 儿童故事</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 min-h-screen">
+    <!-- 加载动画 -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-95 z-50 flex items-center justify-center hidden">
+        <div class="text-center">
+            <div class="loading-spinner"></div>
+            <p class="mt-4 text-xl text-purple-600 font-bold">AI正在创作绘本...</p>
+            <p class="mt-2 text-gray-600">请稍等片刻 ✨</p>
+        </div>
+    </div>
+
+    <!-- 头部 -->
+    <header class="bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold text-center flex items-center justify-center gap-3">
+                <i class="fas fa-book-open"></i>
+                AI英文绘本故事
+                <i class="fas fa-magic"></i>
+            </h1>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 输入区域 -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="bg-white rounded-3xl shadow-xl p-6 border-4 border-purple-300">
+                <label class="block text-xl font-bold text-purple-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-pencil-alt"></i>
+                    告诉AI你想要什么故事：
+                </label>
+                <div class="flex gap-3">
+                    <input 
+                        type="text" 
+                        id="storyInput" 
+                        placeholder="例如：小猪、小兔子、恐龙..." 
+                        class="flex-1 px-4 py-3 border-3 border-purple-300 rounded-xl text-lg focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-200"
+                    >
+                    <button 
+                        id="generateBtn" 
+                        class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
+                    >
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        生成故事
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 绘本展示区 -->
+        <div id="storyContainer" class="hidden">
+            <!-- 标题 -->
+            <div class="text-center mb-8">
+                <h2 id="storyTitle" class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2"></h2>
+                <div class="flex justify-center gap-2 mt-4">
+                    <span class="inline-block w-16 h-2 bg-purple-400 rounded-full"></span>
+                    <span class="inline-block w-16 h-2 bg-pink-400 rounded-full"></span>
+                    <span class="inline-block w-16 h-2 bg-yellow-400 rounded-full"></span>
+                </div>
+            </div>
+
+            <!-- 故事页面 -->
+            <div id="storyPages" class="max-w-5xl mx-auto"></div>
+
+            <!-- 导航按钮 -->
+            <div class="flex justify-center items-center gap-6 mt-8">
+                <button 
+                    id="prevBtn" 
+                    class="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-6 py-3 rounded-full font-bold text-lg hover:shadow-lg transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                    <i class="fas fa-chevron-left"></i>
+                    上一页
+                </button>
+                <div class="text-2xl font-bold text-purple-700">
+                    <span id="currentPage">1</span> / <span id="totalPages">10</span>
+                </div>
+                <button 
+                    id="nextBtn" 
+                    class="bg-gradient-to-r from-green-400 to-green-600 text-white px-6 py-3 rounded-full font-bold text-lg hover:shadow-lg transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                    下一页
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- 重新生成按钮 -->
+            <div class="text-center mt-8">
+                <button 
+                    id="regenerateBtn" 
+                    class="bg-gradient-to-r from-orange-400 to-red-500 text-white px-8 py-3 rounded-full font-bold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
+                >
+                    <i class="fas fa-redo"></i>
+                    重新生成故事
+                </button>
+            </div>
+        </div>
+
+        <!-- 空状态提示 -->
+        <div id="emptyState" class="text-center py-16">
+            <div class="text-8xl mb-6">📚</div>
+            <h3 class="text-3xl font-bold text-purple-600 mb-4">开始创作你的故事吧！</h3>
+            <p class="text-xl text-gray-600">在上方输入框中输入你想要的故事主题</p>
+        </div>
+    </main>
+
+    <!-- 音频播放器（隐藏） -->
+    <audio id="audioPlayer"></audio>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>

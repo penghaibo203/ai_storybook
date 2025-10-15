@@ -1,0 +1,236 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 加载动画 */
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #e0e0e0;
+    border-top: 6px solid #9333ea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 故事页面卡片 */
+.story-page {
+    background: white;
+    border-radius: 2rem;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 4px solid;
+    transition: all 0.3s ease;
+    display: none;
+}
+
+.story-page.active {
+    display: block;
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 图片容器 */
+.story-image-container {
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem;
+}
+
+.story-image {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    display: block;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+/* 文本区域 */
+.story-text-container {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.story-text-container::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 4rem;
+    color: rgba(147, 51, 234, 0.2);
+    font-family: Georgia, serif;
+}
+
+.english-text {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #7c3aed;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.chinese-text {
+    font-size: 1.5rem;
+    color: #ec4899;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+/* 播放按钮 */
+.play-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.play-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
+}
+
+.play-button i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.play-button.playing {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* 页码指示器 */
+.page-indicator {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .english-text {
+        font-size: 1.25rem;
+    }
+    
+    .chinese-text {
+        font-size: 1.1rem;
+    }
+    
+    .story-text-container {
+        padding: 1.5rem;
+    }
+    
+    .story-image {
+        max-height: 300px;
+    }
+}
+
+/* 按钮悬停效果 */
+button:active {
+    transform: scale(0.95);
+}
+
+/* 输入框焦点效果 */
+input:focus {
+    animation: inputGlow 0.3s ease;
+}
+
+@keyframes inputGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 8px rgba(236, 72, 153, 0);
+    }
+}
+
+/* 页面边框颜色变化 */
+.story-page:nth-child(1) { border-color: #ec4899; }
+.story-page:nth-child(2) { border-color: #8b5cf6; }
+.story-page:nth-child(3) { border-color: #3b82f6; }
+.story-page:nth-child(4) { border-color: #10b981; }
+.story-page:nth-child(5) { border-color: #f59e0b; }
+.story-page:nth-child(6) { border-color: #ef4444; }
+.story-page:nth-child(7) { border-color: #06b6d4; }
+.story-page:nth-child(8) { border-color: #84cc16; }
+.story-page:nth-child(9) { border-color: #f97316; }
+.story-page:nth-child(10) { border-color: #a855f7; }
+
+/* 星星装饰 */
+.star-decoration {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.star {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}

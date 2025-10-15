@@ -18,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 
-// 安全中间件
+// 安全中间件 - 简化CSP策略
 const cspDirectives = {
   defaultSrc: ["'self'"],
   styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
@@ -26,17 +26,13 @@ const cspDirectives = {
   scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
   fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
   imgSrc: ["'self'", "data:", "https:", "http:"],
-  connectSrc: ["'self'", "https://api.coze.cn", "https://www.google-analytics.com", "https://analytics.google.com", "https://www.googletagmanager.com", "https://www.google.com", "https://google-analytics.com", "https://www.google.com", "https://stats.g.doubleclick.net"],
+  connectSrc: ["'self'", "https://api.coze.cn"],
   mediaSrc: ["'self'", "https:", "http:"],
   workerSrc: ["'self'", "blob:"],
   childSrc: ["'self'", "blob:"]
 };
 
-// 开发环境使用更宽松的CSP
-if (process.env.NODE_ENV === 'development') {
-  cspDirectives.connectSrc.push("https:", "http:");
-  cspDirectives.imgSrc.push("https:", "http:");
-}
+// CSP策略已简化，不再需要Google Analytics支持
 
 app.use(helmet({
   contentSecurityPolicy: {

@@ -28,7 +28,7 @@ app.use(helmet({
       scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'", "https://api.coze.cn"],
+      connectSrc: ["'self'", "https://api.coze.cn", "https://www.google-analytics.com", "https://analytics.google.com"],
       mediaSrc: ["'self'", "https:", "http:"],
       workerSrc: ["'self'", "blob:"],
       childSrc: ["'self'", "blob:"]
@@ -71,6 +71,13 @@ app.use(express.static(path.join(__dirname), {
 
 // 专门的public目录服务
 app.use('/css', express.static(path.join(__dirname, 'public', 'css'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1y' : '0',
+  etag: true,
+  lastModified: true
+}));
+
+// favicon服务
+app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'favicon.ico'), {
   maxAge: process.env.NODE_ENV === 'production' ? '1y' : '0',
   etag: true,
   lastModified: true

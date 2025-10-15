@@ -62,3 +62,15 @@ Thumbs.db
 # 测试文件
 test-*.js
 debug-*.js
+
+# SSL证书和私钥（安全敏感）
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+ssl/*.csr
+ssl/*.p12
+ssl/*.pfx
+
+# 证书相关临时文件
+ssl/temp/
+ssl/backup/

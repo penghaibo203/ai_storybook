@@ -69,7 +69,41 @@ npm start
 
 ## 部署
 
-### Docker部署
+### HTTPS部署（推荐）
+
+#### 1. 准备SSL证书
+```bash
+# 运行SSL证书生成脚本
+./scripts/generate-ssl.sh
+
+# 选择证书类型：
+# 1) 开发环境自签名证书
+# 2) 生产环境Let's Encrypt证书
+# 3) 导入现有证书
+```
+
+#### 2. 部署到生产环境
+```bash
+# 设置环境变量
+export COZE_API_TOKEN=your_token_here
+
+# 运行HTTPS部署脚本
+./scripts/deploy-https.sh
+```
+
+#### 3. 验证部署
+```bash
+# 检查服务状态
+docker-compose -f docker-compose.https.yml ps
+
+# 测试HTTPS连接
+curl -k https://hypersmart.work
+
+# 查看日志
+docker-compose -f docker-compose.https.yml logs -f
+```
+
+### Docker部署（HTTP）
 
 ```bash
 # 构建镜像

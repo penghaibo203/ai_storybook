@@ -25,7 +25,7 @@ app.use(helmet({
       scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'", "https://api.coze.cn", "https://www.google-analytics.com", "https://analytics.google.com"],
+      connectSrc: ["'self'", "https://api.coze.cn", "https://www.google-analytics.com", "https://analytics.google.com", "https://www.googletagmanager.com", "https://www.google.com", "https://google-analytics.com"],
       mediaSrc: ["'self'", "https:", "http:"],
       workerSrc: ["'self'", "blob:"],
       childSrc: ["'self'", "blob:"]

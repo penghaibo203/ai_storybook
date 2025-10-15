@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
-import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
 import https from 'https';
@@ -18,33 +17,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 
-// 安全中间件
-const cspDirectives = {
-  defaultSrc: ["'self'"],
-  styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
-  scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
-  scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
-  fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
-  imgSrc: ["'self'", "data:", "https:", "http:"],
-  connectSrc: ["'self'", "https://api.coze.cn", "https://www.google-analytics.com", "https://analytics.google.com", "https://www.googletagmanager.com", "https://www.google.com", "https://google-analytics.com", "https://www.google.com", "https://stats.g.doubleclick.net"],
-  mediaSrc: ["'self'", "https:", "http:"],
-  workerSrc: ["'self'", "blob:"],
-  childSrc: ["'self'", "blob:"]
-};
-
-// 开发环境使用更宽松的CSP
-if (process.env.NODE_ENV === 'development') {
-  cspDirectives.connectSrc.push("https:", "http:");
-  cspDirectives.imgSrc.push("https:", "http:");
-}
-
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: cspDirectives
-  },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
-  originAgentCluster: false
-}));
+// 调试模式 - 禁用CSP
+console.log('🔧 调试模式：CSP已禁用');
 
 // CORS配置
 app.use(cors({
@@ -131,7 +105,8 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    version: '1.0.0'
+    version: '1.0.0',
+    debug: true
   });
 });
 

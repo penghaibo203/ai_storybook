@@ -7,8 +7,10 @@
   "scripts": {
     "start": "node server.js",
     "start:https": "node server-https.js",
+    "start:https:debug": "node server-https-debug.js",
     "dev": "nodemon server.js",
     "dev:https": "nodemon server-https.js",
+    "dev:https:debug": "nodemon server-https-debug.js",
     "build": "echo 'No build step required for this project'",
     "test": "echo 'No tests specified'",
     "pm2:start": "pm2 start ecosystem.config.cjs --env production",

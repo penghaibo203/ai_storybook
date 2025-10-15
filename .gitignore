@@ -74,3 +74,11 @@ ssl/*.pfx
 # 证书相关临时文件
 ssl/temp/
 ssl/backup/
+
+# Nginx证书文件
+hypersmart.work_nginx/*.pem
+hypersmart.work_nginx/*.key
+hypersmart.work_nginx/*.crt
+hypersmart.work_nginx/*.csr
+hypersmart.work_nginx/*.p12
+hypersmart.work_nginx/*.pfx

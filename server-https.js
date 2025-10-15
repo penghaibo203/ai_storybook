@@ -1,0 +1,198 @@
+import express from 'express';
+import path from 'path';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import dotenv from 'dotenv';
+import https from 'https';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// ES模块中获取__dirname的替代方案
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+
+// 安全中间件
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
+      fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https:", "http:"],
+      connectSrc: ["'self'", "https://api.coze.cn"],
+      mediaSrc: ["'self'", "https:", "http:"],
+      workerSrc: ["'self'", "blob:"],
+      childSrc: ["'self'", "blob:"]
+    }
+  },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  originAgentCluster: false
+}));
+
+// CORS配置
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://hypersmart.work', 'https://www.hypersmart.work', 'https://129.226.121.30:3443'] 
+    : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3443', 'https://localhost:3443'],
+  credentials: true
+}));
+
+// HTTPS重定向中间件
+app.use((req, res, next) => {
+  if (req.secure || req.header('x-forwarded-proto') === 'https') {
+    next();
+  } else {
+    res.redirect(`https://${req.header('host')}${req.url}`);
+  }
+});
+
+// 压缩中间件
+app.use(compression());
+
+// 解析JSON和URL编码
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// 静态文件服务
+app.use(express.static(path.join(__dirname), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0',
+  etag: true,
+  lastModified: true
+}));
+
+// 专门的public目录服务
+app.use('/css', express.static(path.join(__dirname, 'public', 'css'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1y' : '0',
+  etag: true,
+  lastModified: true
+}));
+
+// API路由 - 代理Coze API请求
+app.post('/api/generate-story', async (req, res) => {
+  try {
+    const { input } = req.body;
+    
+    if (!input || typeof input !== 'string') {
+      return res.status(400).json({ 
+        success: false,
+        error: '请提供有效的故事主题' 
+      });
+    }
+
+    // 导入API模块
+    const { generateStory } = await import('./api.js');
+    
+    console.log(`📝 收到故事生成请求: "${input}"`);
+    
+    const storyData = await generateStory(input);
+    
+    console.log('✅ 故事生成成功');
+    
+    res.json({
+      success: true,
+      data: storyData
+    });
+  } catch (error) {
+    console.error('❌ 生成故事API错误:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || '服务器内部错误'
+    });
+  }
+});
+
+// 健康检查端点
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.0.0'
+  });
+});
+
+// 启动HTTP服务器
+const httpServer = app.listen(PORT, () => {
+  console.log(`🌐 HTTP服务器运行在端口 ${PORT}`);
+  console.log(`📱 访问地址: http://localhost:${PORT}`);
+});
+
+// 启动HTTPS服务器
+let httpsServer = null;
+
+// 检查SSL证书文件
+const sslCertPath = path.join(__dirname, 'ssl', 'hypersmart.work_bundle.crt');
+const sslKeyPath = path.join(__dirname, 'ssl', 'hypersmart.work.key');
+
+if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
+  try {
+    const sslOptions = {
+      cert: fs.readFileSync(sslCertPath),
+      key: fs.readFileSync(sslKeyPath)
+    };
+
+    httpsServer = https.createServer(sslOptions, app);
+    
+    httpsServer.listen(HTTPS_PORT, () => {
+      console.log(`🔒 HTTPS服务器运行在端口 ${HTTPS_PORT}`);
+      console.log(`🌐 访问地址: https://localhost:${HTTPS_PORT}`);
+      console.log(`🌐 生产地址: https://hypersmart.work`);
+    });
+
+    console.log('✅ SSL证书加载成功');
+  } catch (error) {
+    console.error('❌ SSL证书加载失败:', error.message);
+    console.log('⚠️  将仅启动HTTP服务器');
+  }
+} else {
+  console.log('⚠️  SSL证书文件不存在，将仅启动HTTP服务器');
+  console.log('📁 请确保以下文件存在:');
+  console.log(`   - ${sslCertPath}`);
+  console.log(`   - ${sslKeyPath}`);
+}
+
+// 优雅关闭
+process.on('SIGTERM', () => {
+  console.log('🛑 收到SIGTERM信号，正在关闭服务器...');
+  
+  httpServer.close(() => {
+    console.log('✅ HTTP服务器已关闭');
+  });
+
+  if (httpsServer) {
+    httpsServer.close(() => {
+      console.log('✅ HTTPS服务器已关闭');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 收到SIGINT信号，正在关闭服务器...');
+  
+  httpServer.close(() => {
+    console.log('✅ HTTP服务器已关闭');
+  });
+
+  if (httpsServer) {
+    httpsServer.close(() => {
+      console.log('✅ HTTPS服务器已关闭');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});
+
+export default app;

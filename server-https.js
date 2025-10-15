@@ -18,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 
-// 安全中间件 - 简化CSP策略
+// 安全中间件 - 严格CSP策略，完全阻止Google Analytics
 const cspDirectives = {
   defaultSrc: ["'self'"],
   styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
@@ -26,10 +26,16 @@ const cspDirectives = {
   scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
   fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
   imgSrc: ["'self'", "data:", "https:", "http:"],
-  connectSrc: ["'self'", "https://api.coze.cn"],
+  connectSrc: ["'self'", "https://api.coze.cn"], // 严格限制，只允许必要的连接
   mediaSrc: ["'self'", "https:", "http:"],
   workerSrc: ["'self'", "blob:"],
-  childSrc: ["'self'", "blob:"]
+  childSrc: ["'self'", "blob:"],
+  // 明确阻止Google Analytics相关域名
+  frameAncestors: ["'none'"],
+  baseUri: ["'self'"],
+  formAction: ["'self'"],
+  objectSrc: ["'none'"],
+  scriptSrcAttr: ["'none'"]
 };
 
 // CSP策略已简化，不再需要Google Analytics支持

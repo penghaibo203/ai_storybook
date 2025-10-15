@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 安全中间件
+// 安全中间件 - 严格CSP策略，完全阻止Google Analytics
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -25,10 +25,16 @@ app.use(helmet({
       scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'", "https://api.coze.cn"],
+      connectSrc: ["'self'", "https://api.coze.cn"], // 严格限制，只允许必要的连接
       mediaSrc: ["'self'", "https:", "http:"],
       workerSrc: ["'self'", "blob:"],
-      childSrc: ["'self'", "blob:"]
+      childSrc: ["'self'", "blob:"],
+      // 明确阻止Google Analytics相关域名
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      objectSrc: ["'none'"],
+      scriptSrcAttr: ["'none'"]
     }
   },
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },

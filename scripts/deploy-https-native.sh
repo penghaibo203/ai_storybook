@@ -41,11 +41,53 @@ fi
 # 检查必要工具
 echo -e "${YELLOW}🔧 检查必要工具...${NC}"
 
+# 检测操作系统
+detect_os() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if command -v apt-get &> /dev/null; then
+            echo "ubuntu"
+        elif command -v yum &> /dev/null; then
+            echo "centos"
+        elif command -v dnf &> /dev/null; then
+            echo "fedora"
+        else
+            echo "linux"
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "macos"
+    else
+        echo "unknown"
+    fi
+}
+
+OS=$(detect_os)
+echo -e "${BLUE}检测到操作系统: $OS${NC}"
+
 # 检查Node.js
 if ! command -v node &> /dev/null; then
     echo -e "${YELLOW}📦 安装Node.js...${NC}"
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-    apt-get install -y nodejs
+    case $OS in
+        "ubuntu")
+            curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+            apt-get install -y nodejs
+            ;;
+        "centos"|"fedora")
+            curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+            if command -v yum &> /dev/null; then
+                yum install -y nodejs
+            else
+                dnf install -y nodejs
+            fi
+            ;;
+        "macos")
+            echo -e "${RED}❌ 请使用Homebrew安装Node.js: brew install node${NC}"
+            exit 1
+            ;;
+        *)
+            echo -e "${RED}❌ 不支持的操作系统，请手动安装Node.js${NC}"
+            exit 1
+            ;;
+    esac
 fi
 
 # 检查PM2
@@ -57,8 +99,27 @@ fi
 # 检查Nginx
 if ! command -v nginx &> /dev/null; then
     echo -e "${YELLOW}📦 安装Nginx...${NC}"
-    apt-get update
-    apt-get install -y nginx
+    case $OS in
+        "ubuntu")
+            apt-get update
+            apt-get install -y nginx
+            ;;
+        "centos"|"fedora")
+            if command -v yum &> /dev/null; then
+                yum install -y nginx
+            else
+                dnf install -y nginx
+            fi
+            ;;
+        "macos")
+            echo -e "${RED}❌ 请使用Homebrew安装Nginx: brew install nginx${NC}"
+            exit 1
+            ;;
+        *)
+            echo -e "${RED}❌ 不支持的操作系统，请手动安装Nginx${NC}"
+            exit 1
+            ;;
+    esac
 fi
 
 # 检查SSL证书
@@ -193,8 +254,18 @@ nginx -t
 
 # 重启Nginx
 echo -e "${YELLOW}🔄 重启Nginx...${NC}"
-systemctl restart nginx
-systemctl enable nginx
+case $OS in
+    "ubuntu"|"centos"|"fedora")
+        systemctl restart nginx
+        systemctl enable nginx
+        ;;
+    "macos")
+        brew services restart nginx
+        ;;
+    *)
+        echo -e "${YELLOW}⚠️  请手动重启Nginx服务${NC}"
+        ;;
+esac
 
 # 等待服务启动
 echo -e "${YELLOW}⏳ 等待服务启动...${NC}"
@@ -227,7 +298,17 @@ echo -e "${BLUE}PM2进程状态:${NC}"
 pm2 status
 echo ""
 echo -e "${BLUE}Nginx状态:${NC}"
-systemctl status nginx --no-pager -l
+case $OS in
+    "ubuntu"|"centos"|"fedora")
+        systemctl status nginx --no-pager -l
+        ;;
+    "macos")
+        brew services list | grep nginx
+        ;;
+    *)
+        echo "请手动检查Nginx状态"
+        ;;
+esac
 
 # 显示访问信息
 echo ""
@@ -247,7 +328,7 @@ echo ""
 echo -e "${BLUE}🔧 监控命令:${NC}"
 echo "  PM2状态: pm2 status"
 echo "  PM2监控: pm2 monit"
-echo "  Nginx状态: systemctl status nginx"
+echo "  Nginx状态: systemctl status nginx (Linux) 或 brew services list (macOS)"
 echo "  系统资源: htop"
 echo ""
 

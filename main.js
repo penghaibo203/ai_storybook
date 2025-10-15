@@ -26,6 +26,8 @@ const elements = {
 
 // 初始化
 function init() {
+    console.log('🚀 初始化AI英文绘本应用...');
+    
     // 获取DOM元素
     elements.storyInput = document.getElementById('storyInput');
     elements.generateBtn = document.getElementById('generateBtn');
@@ -41,6 +43,14 @@ function init() {
     elements.totalPagesSpan = document.getElementById('totalPages');
     elements.audioPlayer = document.getElementById('audioPlayer');
 
+    // 确保加载覆盖层在初始化时是隐藏的
+    if (elements.loadingOverlay) {
+        elements.loadingOverlay.classList.add('hidden');
+        console.log('✅ 加载覆盖层已隐藏');
+    } else {
+        console.error('❌ 未找到加载覆盖层元素');
+    }
+
     audioPlayer = elements.audioPlayer;
     storyRenderer = new StoryRenderer(elements.storyPages);
 
@@ -49,6 +59,8 @@ function init() {
 
     // 添加装饰元素
     addDecorations();
+    
+    console.log('✅ 应用初始化完成');
 }
 
 // 绑定事件
@@ -268,10 +280,13 @@ function handleAudioEnded() {
 
 // 显示/隐藏加载动画
 function showLoading(show) {
+    console.log(`🔄 设置加载状态: ${show ? '显示' : '隐藏'}`);
     if (show) {
         elements.loadingOverlay.classList.remove('hidden');
+        console.log('✅ 加载覆盖层已显示');
     } else {
         elements.loadingOverlay.classList.add('hidden');
+        console.log('✅ 加载覆盖层已隐藏');
     }
 }
 

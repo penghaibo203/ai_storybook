@@ -68,9 +68,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname), {
-  maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0',
-  etag: true,
-  lastModified: true
+  maxAge: 0, // 禁用缓存用于调试
+  etag: false,
+  lastModified: false
 }));
 
 // 专门的public目录服务

@@ -22,11 +22,11 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
-      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:", "blob:", "data:"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https:", "http:", "blob:", "data:"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-              connectSrc: ["'self'", "https://api.coze.cn", "https://infird.com"], // 允许必要的连接
+              connectSrc: ["'self'", "https:", "http:", "ws:", "wss:"], // 允许所有连接
       mediaSrc: ["'self'", "https:", "http:"],
       workerSrc: ["'self'", "blob:"],
       childSrc: ["'self'", "blob:"],

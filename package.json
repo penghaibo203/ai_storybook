@@ -9,6 +9,7 @@
     "start:https": "node server-https.js",
     "start:https:debug": "node server-https-debug.js",
     "start:https:no-csp": "node server-https-no-csp.js",
+    "start:https:no-csp-fixed": "node server-https-no-csp-fixed.js",
     "dev": "nodemon server.js",
     "dev:https": "nodemon server-https.js",
     "dev:https:debug": "nodemon server-https-debug.js",

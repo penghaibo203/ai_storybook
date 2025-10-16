@@ -35,7 +35,7 @@ app.use(helmet({
       baseUri: ["'self'"],
       formAction: ["'self'"],
       objectSrc: ["'none'"],
-      scriptSrcAttr: ["'none'"]
+      scriptSrcAttr: ["'unsafe-inline'"]
     }
   },
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },

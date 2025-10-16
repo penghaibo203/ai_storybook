@@ -4,12 +4,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
-import https from 'https';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
+import https from 'https';
+import http from 'http';
+import fs from 'fs';
 import { dataManager } from './dataManager.js';
 
-// ES模块中获取__dirname的替代方案
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -19,52 +19,25 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 
-// 安全中间件 - 严格CSP策略，完全阻止Google Analytics
-const cspDirectives = {
-  defaultSrc: ["'self'"],
-  styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
-  scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
-  scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "blob:", "https://infird.com"],
-  fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
-  imgSrc: ["'self'", "data:", "https:", "http:"],
-  connectSrc: ["'self'", "https://api.coze.cn", "https://infird.com"], // 允许必要的连接
-  mediaSrc: ["'self'", "https:", "http:"],
-  workerSrc: ["'self'", "blob:"],
-  childSrc: ["'self'", "blob:"],
-  // 明确阻止Google Analytics相关域名
-  frameAncestors: ["'none'"],
-  baseUri: ["'self'"],
-  formAction: ["'self'"],
-  objectSrc: ["'none'"],
-  scriptSrcAttr: ["'unsafe-inline'"]
-};
-
-// CSP策略已简化，不再需要Google Analytics支持
-
+// 完全禁用CSP和所有安全限制
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: cspDirectives
-  },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
-  originAgentCluster: false
+  contentSecurityPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false,
+  originAgentCluster: false,
+  referrerPolicy: false,
+  xssFilter: false,
+  noSniff: false,
+  frameguard: false,
+  hsts: false
 }));
 
-// CORS配置
+// CORS配置 - 允许所有来源
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://hypersmart.work', 'https://www.hypersmart.work', 'https://129.226.121.30:3443'] 
-    : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3443', 'https://localhost:3443'],
+  origin: true,
   credentials: true
 }));
-
-// HTTPS重定向中间件
-app.use((req, res, next) => {
-  if (req.secure || req.header('x-forwarded-proto') === 'https') {
-    next();
-  } else {
-    res.redirect(`https://${req.header('host')}${req.url}`);
-  }
-});
 
 // 压缩中间件
 app.use(compression());
@@ -75,11 +48,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname), {
-  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0, // 生产环境启用缓存
+  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
   etag: true,
   lastModified: true,
   setHeaders: (res, path) => {
-    // 为JS和CSS文件设置正确的MIME类型
     if (path.endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript');
     } else if (path.endsWith('.css')) {
@@ -90,7 +62,7 @@ app.use(express.static(path.join(__dirname), {
 
 // 专门的public目录服务
 app.use('/css', express.static(path.join(__dirname, 'public', 'css'), {
-  maxAge: 0, // 禁用CSS缓存用于调试
+  maxAge: 0,
   etag: false,
   lastModified: false
 }));
@@ -108,7 +80,8 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    csp: 'completely disabled'
   });
 });
 
@@ -128,9 +101,6 @@ app.post('/api/generate-story', async (req, res) => {
       });
     }
 
-    // 导入API模块
-    const { generateStory } = await import('./api.js');
-    
     console.log(`📝 收到故事生成请求: "${input}"`);
     
     const storyData = await generateStory(input);
@@ -238,15 +208,64 @@ app.delete('/api/records/:id', (req, res) => {
   }
 });
 
-// 健康检查端点
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    version: '1.0.0'
+// 故事生成函数
+async function generateStory(input) {
+  // 导入Coze API
+  const { CozeAPI } = await import('@coze/api');
+  
+  const apiClient = new CozeAPI({
+    token: process.env.COZE_API_TOKEN,
+    baseURL: process.env.COZE_BASE_URL || 'https://api.coze.cn'
   });
-});
+
+  console.log('🚀 开始调用Coze API生成故事...');
+  console.log('📝 输入主题:', input);
+  console.log('🔑 使用Token:', process.env.COZE_API_TOKEN?.substring(0, 20) + '...');
+  console.log('🆔 Workflow ID:', process.env.COZE_WORKFLOW_ID);
+
+  const workflowId = process.env.COZE_WORKFLOW_ID || '7561291747888807978';
+  
+  const response = await apiClient.workflows.runs.stream({
+    workflow_id: workflowId,
+    parameters: {
+      input: input
+    }
+  });
+
+  console.log('📡 API响应:', response);
+
+  let fullContent = '';
+  
+  for await (const chunk of response) {
+    console.log('📦 收到数据块:', chunk);
+    
+    if (chunk.event === 'Message' && chunk.data?.content) {
+      fullContent += chunk.data.content;
+      console.log('📄 收到内容:', chunk.data.content);
+    }
+  }
+
+  if (!fullContent) {
+    throw new Error('API返回内容为空');
+  }
+
+  // 解析JSON内容
+  let storyData;
+  try {
+    storyData = JSON.parse(fullContent);
+    console.log('✅ 解析成功:', storyData);
+  } catch (parseError) {
+    console.error('❌ JSON解析失败:', parseError);
+    throw new Error('API返回数据格式错误');
+  }
+
+  // 验证必要字段
+  if (!storyData.story || !storyData.images) {
+    throw new Error('API返回数据不完整');
+  }
+
+  return storyData;
+}
 
 // 启动HTTP服务器
 const httpServer = app.listen(PORT, () => {
@@ -283,44 +302,25 @@ if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
   }
 } else {
   console.log('⚠️  SSL证书文件不存在，将仅启动HTTP服务器');
-  console.log('📁 请确保以下文件存在:');
-  console.log(`   - ${sslCertPath}`);
-  console.log(`   - ${sslKeyPath}`);
+  console.log('📁 证书路径:', sslCertPath);
+  console.log('📁 密钥路径:', sslKeyPath);
 }
 
 // 优雅关闭
-process.on('SIGTERM', () => {
-  console.log('🛑 收到SIGTERM信号，正在关闭服务器...');
+const gracefulShutdown = (signal) => {
+  console.log(`🛑 收到${signal}信号，正在关闭服务器...`);
   
-  httpServer.close(() => {
-    console.log('✅ HTTP服务器已关闭');
-  });
-
   if (httpsServer) {
     httpsServer.close(() => {
       console.log('✅ HTTPS服务器已关闭');
-      process.exit(0);
     });
-  } else {
-    process.exit(0);
   }
-});
-
-process.on('SIGINT', () => {
-  console.log('🛑 收到SIGINT信号，正在关闭服务器...');
   
   httpServer.close(() => {
     console.log('✅ HTTP服务器已关闭');
-  });
-
-  if (httpsServer) {
-    httpsServer.close(() => {
-      console.log('✅ HTTPS服务器已关闭');
-      process.exit(0);
-    });
-  } else {
     process.exit(0);
-  }
-});
+  });
+};
 
-export default app;
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

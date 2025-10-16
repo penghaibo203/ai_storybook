@@ -588,6 +588,13 @@
         // 页面加载时初始化
         document.addEventListener('DOMContentLoaded', () => {
             loadRecords();
+            
+            // 添加全局事件监听器
+            document.addEventListener('click', function(e) {
+                if (e.target.id === 'retryBtn') {
+                    loadRecords();
+                }
+            });
         });
 
         // 加载记录列表
@@ -632,7 +639,7 @@
                     <div class="empty-icon">❌</div>
                     <div class="empty-title">加载失败</div>
                     <div class="empty-description">${message}</div>
-                    <button class="nav-btn" onclick="loadRecords()">重试</button>
+                    <button class="nav-btn" id="retryBtn">重试</button>
                 </div>
             `;
         }
@@ -654,14 +661,14 @@
                         <div class="empty-icon">📚</div>
                         <div class="empty-title">还没有绘本记录</div>
                         <div class="empty-description">去创建您的第一个AI绘本故事吧！</div>
-                        <a href="/" class="nav-btn">✨ 创建绘本</a>
+                        <a href="/" class="nav-btn" id="createStoryBtn">✨ 创建绘本</a>
                     </div>
                 `;
                 return;
             }
 
             recordsList.innerHTML = records.map(record => `
-                <div class="record-item" onclick="viewRecord('${record.id}')">
+                <div class="record-item" data-record-id="${record.id}">
                     <div class="record-header">
                         <div>
                             <div class="record-title">${escapeHtml(record.title)}</div>
@@ -685,16 +692,52 @@
                         <strong>主题:</strong> ${escapeHtml(record.input || record.inputPrompt || '未知')}
                     </div>
                     
-                    <div class="record-actions" onclick="event.stopPropagation()">
-                        <button class="action-btn view-btn" onclick="viewRecord('${record.id}')">
+                    <div class="record-actions">
+                        <button class="action-btn view-btn" data-record-id="${record.id}">
                             👁️ 查看绘本
                         </button>
-                        <button class="action-btn delete-btn" onclick="deleteRecord('${record.id}')">
+                        <button class="action-btn delete-btn" data-record-id="${record.id}">
                             🗑️ 删除
                         </button>
                     </div>
                 </div>
             `).join('');
+            
+            // 添加事件监听器
+            addEventListeners();
+        }
+
+        // 添加事件监听器
+        function addEventListeners() {
+            // 记录项点击事件
+            document.querySelectorAll('.record-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // 如果点击的是按钮，不触发记录项点击
+                    if (e.target.closest('.record-actions')) {
+                        return;
+                    }
+                    const recordId = this.getAttribute('data-record-id');
+                    viewRecord(recordId);
+                });
+            });
+            
+            // 查看按钮点击事件
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const recordId = this.getAttribute('data-record-id');
+                    viewRecord(recordId);
+                });
+            });
+            
+            // 删除按钮点击事件
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const recordId = this.getAttribute('data-record-id');
+                    deleteRecord(recordId);
+                });
+            });
         }
 
         // 查看记录详情

@@ -2,7 +2,7 @@
  * 故事渲染器类
  * 负责将故事数据渲染成HTML元素
  */
-export class StoryRenderer {
+class StoryRenderer {
     constructor(container) {
         this.container = container;
         this.currentPage = 0;
@@ -232,4 +232,5 @@ export class StoryRenderer {
     }
 }
 
-export default StoryRenderer;
+// 将StoryRenderer类暴露到全局作用域
+window.StoryRenderer = StoryRenderer;

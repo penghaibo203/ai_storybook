@@ -1,5 +1,4 @@
-// 导入故事渲染器
-import { StoryRenderer } from './storyRenderer.js';
+// 故事渲染器将在HTML中通过script标签引入
 
 // 全局状态
 let currentStoryData = null;
@@ -591,4 +590,6 @@ document.addEventListener('DOMContentLoaded', () => {
     checkForRecordId();
 });
 
-export { currentStoryData, currentPage };
+// 导出变量供其他脚本使用
+window.currentStoryData = currentStoryData;
+window.currentPage = currentPage;

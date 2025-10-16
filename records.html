@@ -838,7 +838,11 @@
         // 查看记录
         function viewRecord(recordId) {
             console.log('👁️ 查看绘本记录:', recordId);
-            window.location.href = `/?record=${recordId}`;
+            // 将记录ID存储到localStorage
+            localStorage.setItem('currentRecordId', recordId);
+            console.log('💾 记录ID已存储到localStorage:', recordId);
+            // 跳转到主页
+            window.location.href = '/';
         }
 
         // 删除记录

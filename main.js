@@ -509,19 +509,20 @@ function hideDecorations() {
     }
 }
 
-// 检查URL参数中的记录ID
+// 检查localStorage中的记录ID
 function checkForRecordId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const recordId = urlParams.get('record');
+    const recordId = localStorage.getItem('currentRecordId');
     
-    console.log('🔍 检查URL参数:', window.location.search);
-    console.log('🔍 解析的记录ID:', recordId);
+    console.log('🔍 检查localStorage中的记录ID:', recordId);
     
     if (recordId) {
         console.log('🔍 检测到记录ID:', recordId);
         loadRecordById(recordId);
+        // 清除localStorage中的记录ID，避免重复加载
+        localStorage.removeItem('currentRecordId');
+        console.log('🧹 已清除localStorage中的记录ID');
     } else {
-        console.log('ℹ️ 未检测到记录ID参数');
+        console.log('ℹ️ 没有检测到记录ID，显示默认页面');
     }
 }
 
@@ -562,12 +563,6 @@ async function loadRecordById(recordId) {
             console.log('📚 准备显示故事数据:', currentStoryData);
             displayStory(currentStoryData);
             showNotification(`已加载历史绘本: ${record.title}`, 'success');
-            
-            // 延迟清除URL参数，确保故事完全显示后再清理
-            setTimeout(() => {
-                window.history.replaceState({}, document.title, window.location.pathname);
-                console.log('🧹 URL参数已清除');
-            }, 1000);
         } else {
             throw new Error(result.error || '加载记录失败');
         }

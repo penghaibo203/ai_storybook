@@ -22,8 +22,8 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:", "blob:", "data:"],
-      scriptSrcElem: ["'self'", "'unsafe-inline'", "https:", "http:", "blob:", "data:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:", "blob:", "data:", "https://infird.com"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https:", "http:", "blob:", "data:", "https://infird.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
               connectSrc: ["'self'", "https:", "http:", "ws:", "wss:"], // 允许所有连接

@@ -561,8 +561,11 @@ async function loadRecordById(recordId) {
             displayStory(currentStoryData);
             showNotification(`已加载历史绘本: ${record.title}`, 'success');
             
-            // 清除URL参数
-            window.history.replaceState({}, document.title, window.location.pathname);
+            // 延迟清除URL参数，确保故事完全显示后再清理
+            setTimeout(() => {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                console.log('🧹 URL参数已清除');
+            }, 1000);
         } else {
             throw new Error(result.error || '加载记录失败');
         }

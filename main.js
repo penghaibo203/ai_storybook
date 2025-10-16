@@ -428,9 +428,14 @@ function checkForRecordId() {
     const urlParams = new URLSearchParams(window.location.search);
     const recordId = urlParams.get('record');
     
+    console.log('🔍 检查URL参数:', window.location.search);
+    console.log('🔍 解析的记录ID:', recordId);
+    
     if (recordId) {
         console.log('🔍 检测到记录ID:', recordId);
         loadRecordById(recordId);
+    } else {
+        console.log('ℹ️ 未检测到记录ID参数');
     }
 }
 
@@ -446,12 +451,16 @@ async function loadRecordById(recordId) {
         }
         
         const result = await response.json();
+        console.log('📦 API响应:', result);
+        
         if (result.success) {
             const record = result.data;
             console.log('✅ 历史记录加载成功:', record.title);
+            console.log('📋 记录数据结构:', record);
             
             // 设置输入框的值
-            elements.storyInput.value = record.input;
+            elements.storyInput.value = record.input || record.inputPrompt || '';
+            console.log('📝 设置输入框值:', elements.storyInput.value);
             
             // 显示故事
             currentStoryData = {
@@ -462,6 +471,7 @@ async function loadRecordById(recordId) {
             };
             currentPage = 0;
             
+            console.log('📚 准备显示故事数据:', currentStoryData);
             displayStory(currentStoryData);
             showNotification(`已加载历史绘本: ${record.title}`, 'success');
             

@@ -665,13 +665,13 @@
                     <div class="record-header">
                         <div>
                             <div class="record-title">${escapeHtml(record.title)}</div>
-                            <div class="record-date">${formatDate(record.createdAt)}</div>
+                            <div class="record-date">${formatDate(record.createdAt || record.generatedAt)}</div>
                         </div>
                     </div>
                     
                     <div class="record-meta">
                         <div class="meta-item">
-                            📄 ${record.pageCount} 页
+                            📄 ${record.story ? record.story.length : 0} 页
                         </div>
                         <div class="meta-item">
                             🎨 ${record.images ? record.images.length : 0} 张图片
@@ -682,7 +682,7 @@
                     </div>
                     
                     <div class="record-input">
-                        <strong>主题:</strong> ${escapeHtml(record.input)}
+                        <strong>主题:</strong> ${escapeHtml(record.input || record.inputPrompt || '未知')}
                     </div>
                     
                     <div class="record-actions" onclick="event.stopPropagation()">
@@ -699,6 +699,7 @@
 
         // 查看记录详情
         function viewRecord(id) {
+            console.log('🔍 点击查看记录:', id);
             // 跳转到主页面并传递记录ID
             window.location.href = `/?record=${id}`;
         }

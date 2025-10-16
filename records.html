@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绘本生成记录 - AI英文绘本</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fdf2f8 0%, #e0e7ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+            color: #374151;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 头部 */
+        header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* 统计卡片 */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #8b5cf6;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #8b5cf6;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        /* 记录列表 */
+        .records-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .records-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .records-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 记录项 */
+        .record-item {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .record-item:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+        }
+        
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .record-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .record-date {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .record-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .record-input {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            font-style: italic;
+        }
+        
+        .record-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .view-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+        
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6b7280;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .empty-description {
+            margin-bottom: 2rem;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .record-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .record-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header>
+            <h1>📚 绘本生成记录</h1>
+            <p>查看和管理您创建的所有AI绘本故事</p>
+        </header>
+        
+        <!-- 导航按钮 -->
+        <div class="nav-buttons">
+            <a href="/" class="nav-btn">
+                🏠 返回首页
+            </a>
+            <a href="/" class="nav-btn">
+                ✨ 创建新绘本
+            </a>
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="stats-container" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRecords">-</div>
+                <div class="stat-label">总绘本数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="thisMonthRecords">-</div>
+                <div class="stat-label">本月创建</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalPages">-</div>
+                <div class="stat-label">总页数</div>
+            </div>
+        </div>
+        
+        <!-- 记录列表 -->
+        <div class="records-container">
+            <div class="records-header">
+                <h2 class="records-title">📖 我的绘本</h2>
+                <button class="refresh-btn" onclick="loadRecords()">
+                    🔄 刷新
+                </button>
+            </div>
+            
+            <div id="recordsList">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在加载绘本记录...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let records = [];
+        let stats = {};
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRecords();
+        });
+
+        // 加载记录列表
+        async function loadRecords() {
+            try {
+                showLoading();
+                
+                const response = await fetch('/api/records');
+                if (!response.ok) {
+                    throw new Error('获取记录失败');
+                }
+                
+                const result = await response.json();
+                if (result.success) {
+                    records = result.data.records;
+                    stats = result.data.stats;
+                    updateStats();
+                    renderRecords();
+                } else {
+                    throw new Error(result.error || '获取记录失败');
+                }
+            } catch (error) {
+                console.error('加载记录失败:', error);
+                showError('加载记录失败: ' + error.message);
+            }
+        }
+
+        // 显示加载状态
+        function showLoading() {
+            document.getElementById('recordsList').innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在加载绘本记录...</p>
+                </div>
+            `;
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            document.getElementById('recordsList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">❌</div>
+                    <div class="empty-title">加载失败</div>
+                    <div class="empty-description">${message}</div>
+                    <button class="nav-btn" onclick="loadRecords()">重试</button>
+                </div>
+            `;
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = stats.total || 0;
+            document.getElementById('thisMonthRecords').textContent = stats.thisMonth || 0;
+            document.getElementById('totalPages').textContent = stats.totalPages || 0;
+        }
+
+        // 渲染记录列表
+        function renderRecords() {
+            const recordsList = document.getElementById('recordsList');
+            
+            if (records.length === 0) {
+                recordsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📚</div>
+                        <div class="empty-title">还没有绘本记录</div>
+                        <div class="empty-description">去创建您的第一个AI绘本故事吧！</div>
+                        <a href="/" class="nav-btn">✨ 创建绘本</a>
+                    </div>
+                `;
+                return;
+            }
+
+            recordsList.innerHTML = records.map(record => `
+                <div class="record-item" onclick="viewRecord('${record.id}')">
+                    <div class="record-header">
+                        <div>
+                            <div class="record-title">${escapeHtml(record.title)}</div>
+                            <div class="record-date">${formatDate(record.createdAt)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="record-meta">
+                        <div class="meta-item">
+                            📄 ${record.pageCount} 页
+                        </div>
+                        <div class="meta-item">
+                            🎨 ${record.images ? record.images.length : 0} 张图片
+                        </div>
+                        <div class="meta-item">
+                            🔊 ${record.voice ? record.voice.length : 0} 个音频
+                        </div>
+                    </div>
+                    
+                    <div class="record-input">
+                        <strong>主题:</strong> ${escapeHtml(record.input)}
+                    </div>
+                    
+                    <div class="record-actions" onclick="event.stopPropagation()">
+                        <button class="action-btn view-btn" onclick="viewRecord('${record.id}')">
+                            👁️ 查看绘本
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteRecord('${record.id}')">
+                            🗑️ 删除
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 查看记录详情
+        function viewRecord(id) {
+            // 跳转到主页面并传递记录ID
+            window.location.href = `/?record=${id}`;
+        }
+
+        // 删除记录
+        async function deleteRecord(id) {
+            if (!confirm('确定要删除这个绘本记录吗？删除后无法恢复。')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/records/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('删除失败');
+                }
+                
+                const result = await response.json();
+                if (result.success) {
+                    showNotification('绘本记录删除成功', 'success');
+                    loadRecords(); // 重新加载列表
+                } else {
+                    throw new Error(result.error || '删除失败');
+                }
+            } catch (error) {
+                console.error('删除记录失败:', error);
+                showNotification('删除失败: ' + error.message, 'error');
+            }
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) {
+                return '昨天';
+            } else if (diffDays < 7) {
+                return `${diffDays} 天前`;
+            } else {
+                return date.toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-0 opacity-100 z-50 ${
+                type === 'success' ? 'bg-green-500' :
+                type === 'error' ? 'bg-red-500' :
+                'bg-blue-500'
+            } text-white max-w-md`;
+            
+            notification.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="flex-1">${message}</div>
+                    <button class="text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+                        ✕
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

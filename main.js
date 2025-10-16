@@ -394,7 +394,65 @@ function addDecorations() {
     document.body.appendChild(container);
 }
 
+// 检查URL参数中的记录ID
+function checkForRecordId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const recordId = urlParams.get('record');
+    
+    if (recordId) {
+        console.log('🔍 检测到记录ID:', recordId);
+        loadRecordById(recordId);
+    }
+}
+
+// 根据ID加载历史记录
+async function loadRecordById(recordId) {
+    try {
+        showLoading(true);
+        console.log('📖 正在加载历史记录:', recordId);
+        
+        const response = await fetch(`/api/records/${recordId}`);
+        if (!response.ok) {
+            throw new Error('记录不存在');
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+            const record = result.data;
+            console.log('✅ 历史记录加载成功:', record.title);
+            
+            // 设置输入框的值
+            elements.storyInput.value = record.input;
+            
+            // 显示故事
+            currentStoryData = {
+                title: record.title,
+                story: record.story,
+                images: record.images,
+                voice: record.voice
+            };
+            currentPage = 0;
+            
+            displayStory(currentStoryData);
+            showNotification(`已加载历史绘本: ${record.title}`, 'success');
+            
+            // 清除URL参数
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            throw new Error(result.error || '加载记录失败');
+        }
+    } catch (error) {
+        console.error('❌ 加载历史记录失败:', error);
+        showNotification(`加载历史记录失败: ${error.message}`, 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
 // 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    checkForRecordId();
+});
 
 export { currentStoryData, currentPage };

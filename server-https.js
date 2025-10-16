@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import https from 'https';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { dataManager } from './dataManager.js';
 
 // ES模块中获取__dirname的替代方案
 const __filename = fileURLToPath(import.meta.url);
@@ -113,6 +114,10 @@ app.get('/health', (req, res) => {
 
 // API路由 - 代理Coze API请求
 app.post('/api/generate-story', async (req, res) => {
+  // 设置更长的超时时间
+  req.setTimeout(120000); // 2分钟
+  res.setTimeout(120000); // 2分钟
+  
   try {
     const { input } = req.body;
     
@@ -132,15 +137,103 @@ app.post('/api/generate-story', async (req, res) => {
     
     console.log('✅ 故事生成成功');
     
-    res.json({
-      success: true,
-      data: storyData
-    });
+    // 保存绘本记录
+    try {
+      const savedRecord = dataManager.saveRecord(storyData, input);
+      console.log('💾 绘本记录已保存:', savedRecord.id);
+      
+      res.json({
+        success: true,
+        data: storyData,
+        recordId: savedRecord.id
+      });
+    } catch (saveError) {
+      console.error('⚠️ 保存绘本记录失败，但故事生成成功:', saveError);
+      res.json({
+        success: true,
+        data: storyData,
+        warning: '故事生成成功，但保存记录失败'
+      });
+    }
   } catch (error) {
     console.error('❌ 生成故事API错误:', error);
     res.status(500).json({
       success: false,
       error: error.message || '服务器内部错误'
+    });
+  }
+});
+
+// 获取绘本记录列表
+app.get('/api/records', (req, res) => {
+  try {
+    const records = dataManager.getAllRecords();
+    const stats = dataManager.getStats();
+    
+    res.json({
+      success: true,
+      data: {
+        records,
+        stats
+      }
+    });
+  } catch (error) {
+    console.error('❌ 获取绘本记录失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取绘本记录失败'
+    });
+  }
+});
+
+// 获取单个绘本记录
+app.get('/api/records/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const record = dataManager.getRecordById(id);
+    
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        error: '绘本记录不存在'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: record
+    });
+  } catch (error) {
+    console.error('❌ 获取绘本记录失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取绘本记录失败'
+    });
+  }
+});
+
+// 删除绘本记录
+app.delete('/api/records/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = dataManager.deleteRecord(id);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: '绘本记录删除成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: '绘本记录不存在'
+      });
+    }
+  } catch (error) {
+    console.error('❌ 删除绘本记录失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '删除绘本记录失败'
     });
   }
 });

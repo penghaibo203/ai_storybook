@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>样式预览 - AI英文绘本</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #fdf2f8 0%, #e0e7ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .preview-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preview-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1 class="preview-title">🎨 样式预览</h1>
+        
+        <!-- 页码指示器预览 -->
+        <div class="preview-section">
+            <h2 class="section-title">📖 页码指示器</h2>
+            <div style="position: relative; height: 100px; background: #f3f4f6; border-radius: 1rem; margin: 1rem 0;">
+                <div class="page-indicator">第 1 页</div>
+            </div>
+        </div>
+        
+        <!-- 播放按钮预览 -->
+        <div class="preview-section">
+            <h2 class="section-title">🔊 播放按钮</h2>
+            <div style="position: relative; height: 150px; background: #f3f4f6; border-radius: 1rem; margin: 1rem 0;">
+                <div class="play-button">
+                    <span style="color: white; font-size: 2.5rem;">▶️</span>
+                </div>
+            </div>
+            <div style="position: relative; height: 150px; background: #f3f4f6; border-radius: 1rem; margin: 1rem 0;">
+                <div class="play-button playing">
+                    <span style="color: white; font-size: 2.5rem;">⏸️</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 文本样式预览 -->
+        <div class="preview-section">
+            <h2 class="section-title">📝 故事文本</h2>
+            <div class="story-text-container">
+                <div class="english-text">A little pig lives on a farm.</div>
+                <div class="chinese-text">一只小猪住在农场里。</div>
+            </div>
+        </div>
+        
+        <!-- 说明文字 -->
+        <div style="text-align: center; color: #6b7280; margin-top: 2rem;">
+            <p>✨ 这些是优化后的样式，更加符合小朋友的审美！</p>
+            <p>🎨 包含动画效果、渐变色彩和可爱的装饰元素</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -76,8 +76,8 @@ function bindEvents() {
     });
 
     // 导航按钮
-    elements.prevBtn.addEventListener('click', () => navigatePage(-1));
-    elements.nextBtn.addEventListener('click', () => navigatePage(1));
+    elements.prevBtn.addEventListener('click', handlePrevPage);
+    elements.nextBtn.addEventListener('click', handleNextPage);
 
     // 重新生成按钮
     elements.regenerateBtn.addEventListener('click', handleRegenerate);
@@ -89,8 +89,24 @@ function bindEvents() {
     elements.storyPages.addEventListener('click', (e) => {
         const playButton = e.target.closest('.play-button');
         if (playButton) {
-            const pageIndex = parseInt(playButton.dataset.page);
-            handlePlayAudio(pageIndex);
+            const audioUrl = playButton.dataset.audio;
+            if (audioUrl) {
+                // 直接播放音频
+                if (!audioPlayer.paused && audioPlayer.src === audioUrl) {
+                    audioPlayer.pause();
+                    playButton.classList.remove('playing');
+                    playButton.textContent = '▶️';
+                } else {
+                    stopAudio();
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.play().catch(error => {
+                        console.error('音频播放失败:', error);
+                        alert('音频播放失败，请重试！');
+                    });
+                    playButton.classList.add('playing');
+                    playButton.textContent = '⏸️';
+                }
+            }
         }
     });
 }
@@ -173,12 +189,8 @@ function displayStory(data) {
     // 渲染故事页面
     storyRenderer.render(data);
 
-    // 更新总页数
-    const totalPages = data.story.length;
-    elements.totalPagesSpan.textContent = totalPages;
-
-    // 显示第一页
-    showPage(0);
+    // 更新页面显示
+    updatePageDisplay();
 }
 
 // 显示指定页面
@@ -216,10 +228,53 @@ function showPage(pageIndex) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 导航页面
+// 处理上一页
+function handlePrevPage() {
+    console.log('⬅️ 上一页按钮被点击');
+    if (storyRenderer && storyRenderer.prevPage()) {
+        currentPage = storyRenderer.getCurrentPage();
+        updatePageDisplay();
+    }
+}
+
+// 处理下一页
+function handleNextPage() {
+    console.log('➡️ 下一页按钮被点击');
+    if (storyRenderer && storyRenderer.nextPage()) {
+        currentPage = storyRenderer.getCurrentPage();
+        updatePageDisplay();
+    }
+}
+
+// 更新页面显示
+function updatePageDisplay() {
+    if (!storyRenderer) return;
+    
+    const totalPages = storyRenderer.getTotalPages();
+    const currentPageIndex = storyRenderer.getCurrentPage();
+    
+    // 更新页码显示
+    elements.currentPageSpan.textContent = currentPageIndex + 1;
+    elements.totalPagesSpan.textContent = totalPages;
+    
+    // 更新按钮状态
+    elements.prevBtn.disabled = currentPageIndex === 0;
+    elements.nextBtn.disabled = currentPageIndex === totalPages - 1;
+    
+    // 停止当前音频
+    stopAudio();
+    
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 导航页面（保留兼容性）
 function navigatePage(direction) {
-    const newPage = currentPage + direction;
-    showPage(newPage);
+    if (direction === -1) {
+        handlePrevPage();
+    } else if (direction === 1) {
+        handleNextPage();
+    }
 }
 
 // 处理音频播放
@@ -229,14 +284,14 @@ function handlePlayAudio(pageIndex) {
     const audioUrl = currentStoryData.voice[pageIndex];
     if (!audioUrl) return;
 
-    const playButton = elements.storyPages.querySelector(`[data-page="${pageIndex}"]`);
+    const playButton = elements.storyPages.querySelector(`[data-audio="${audioUrl}"]`);
     
     // 如果正在播放当前音频，则暂停
     if (!audioPlayer.paused && audioPlayer.src === audioUrl) {
         audioPlayer.pause();
         if (playButton) {
             playButton.classList.remove('playing');
-            playButton.querySelector('i').className = 'fas fa-play';
+            playButton.textContent = '▶️';
         }
         return;
     }
@@ -254,7 +309,7 @@ function handlePlayAudio(pageIndex) {
     // 更新按钮状态
     if (playButton) {
         playButton.classList.add('playing');
-        playButton.querySelector('i').className = 'fas fa-pause';
+        playButton.textContent = '⏸️';
     }
 }
 
@@ -269,7 +324,7 @@ function stopAudio() {
     const allPlayButtons = elements.storyPages.querySelectorAll('.play-button');
     allPlayButtons.forEach(btn => {
         btn.classList.remove('playing');
-        btn.querySelector('i').className = 'fas fa-play';
+        btn.textContent = '▶️';
     });
 }
 

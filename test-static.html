@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>静态文件测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .loading { color: orange; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 静态文件服务测试</h1>
+    
+    <div class="test-item">
+        <h3>📁 文件访问测试</h3>
+        <button onclick="testFile('main.js')">测试 main.js</button>
+        <button onclick="testFile('style.css')">测试 style.css</button>
+        <button onclick="testFile('storyRenderer.js')">测试 storyRenderer.js</button>
+        <button onclick="testFile('index.html')">测试 index.html</button>
+        <div id="fileResults"></div>
+    </div>
+    
+    <div class="test-item">
+        <h3>🏥 健康检查</h3>
+        <button onclick="testHealth()">测试 /health</button>
+        <div id="healthResults"></div>
+    </div>
+    
+    <div class="test-item">
+        <h3>🌐 API测试</h3>
+        <button onclick="testAPI()">测试 /api/generate-story</button>
+        <div id="apiResults"></div>
+    </div>
+    
+    <div class="test-item">
+        <h3>📊 测试结果汇总</h3>
+        <div id="summary"></div>
+    </div>
+
+    <script>
+        const results = {
+            files: {},
+            health: null,
+            api: null
+        };
+
+        async function testFile(filename) {
+            const resultDiv = document.getElementById('fileResults');
+            const statusDiv = document.createElement('div');
+            statusDiv.innerHTML = `<span class="loading">🔄 测试 ${filename}...</span>`;
+            resultDiv.appendChild(statusDiv);
+
+            try {
+                const response = await fetch(`/${filename}`);
+                if (response.ok) {
+                    statusDiv.innerHTML = `<span class="success">✅ ${filename} - 状态: ${response.status}</span>`;
+                    results.files[filename] = { status: 'success', code: response.status };
+                } else {
+                    statusDiv.innerHTML = `<span class="error">❌ ${filename} - 状态: ${response.status}</span>`;
+                    results.files[filename] = { status: 'error', code: response.status };
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">❌ ${filename} - 错误: ${error.message}</span>`;
+                results.files[filename] = { status: 'error', error: error.message };
+            }
+            
+            updateSummary();
+        }
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('healthResults');
+            const statusDiv = document.createElement('div');
+            statusDiv.innerHTML = `<span class="loading">🔄 测试健康检查...</span>`;
+            resultDiv.appendChild(statusDiv);
+
+            try {
+                const response = await fetch('/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `<span class="success">✅ 健康检查通过 - 状态: ${data.status}</span>`;
+                    results.health = { status: 'success', data: data };
+                } else {
+                    statusDiv.innerHTML = `<span class="error">❌ 健康检查失败 - 状态: ${response.status}</span>`;
+                    results.health = { status: 'error', code: response.status };
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">❌ 健康检查错误: ${error.message}</span>`;
+                results.health = { status: 'error', error: error.message };
+            }
+            
+            updateSummary();
+        }
+
+        async function testAPI() {
+            const resultDiv = document.getElementById('apiResults');
+            const statusDiv = document.createElement('div');
+            statusDiv.innerHTML = `<span class="loading">🔄 测试API...</span>`;
+            resultDiv.appendChild(statusDiv);
+
+            try {
+                const response = await fetch('/api/generate-story', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ input: 'test' })
+                });
+                
+                if (response.ok) {
+                    statusDiv.innerHTML = `<span class="success">✅ API测试通过 - 状态: ${response.status}</span>`;
+                    results.api = { status: 'success', code: response.status };
+                } else {
+                    statusDiv.innerHTML = `<span class="error">❌ API测试失败 - 状态: ${response.status}</span>`;
+                    results.api = { status: 'error', code: response.status };
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">❌ API测试错误: ${error.message}</span>`;
+                results.api = { status: 'error', error: error.message };
+            }
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            let summary = '<h4>测试结果汇总:</h4>';
+            
+            // 文件测试结果
+            summary += '<h5>📁 文件访问:</h5>';
+            Object.keys(results.files).forEach(filename => {
+                const result = results.files[filename];
+                const icon = result.status === 'success' ? '✅' : '❌';
+                summary += `<div>${icon} ${filename}: ${result.status} (${result.code || result.error})</div>`;
+            });
+            
+            // 健康检查结果
+            if (results.health) {
+                summary += '<h5>🏥 健康检查:</h5>';
+                const icon = results.health.status === 'success' ? '✅' : '❌';
+                summary += `<div>${icon} ${results.health.status} (${results.health.code || results.health.error})</div>`;
+            }
+            
+            // API测试结果
+            if (results.api) {
+                summary += '<h5>🌐 API测试:</h5>';
+                const icon = results.api.status === 'success' ? '✅' : '❌';
+                summary += `<div>${icon} ${results.api.status} (${results.api.code || results.api.error})</div>`;
+            }
+            
+            summaryDiv.innerHTML = summary;
+        }
+
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testFile('main.js');
+                testFile('style.css');
+                testHealth();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

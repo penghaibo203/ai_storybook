@@ -5,6 +5,8 @@
 export class StoryRenderer {
     constructor(container) {
         this.container = container;
+        this.currentPage = 0;
+        this.storyData = null;
     }
 
     /**
@@ -17,14 +19,91 @@ export class StoryRenderer {
             return;
         }
 
+        // 保存故事数据
+        this.storyData = data;
+        this.currentPage = 0;
+
         // 清空容器
         this.container.innerHTML = '';
 
-        // 渲染每一页
-        data.story.forEach((text, index) => {
-            const pageElement = this.createPage(text, data.images[index], index);
-            this.container.appendChild(pageElement);
-        });
+        // 只渲染第一页
+        this.renderCurrentPage();
+    }
+
+    /**
+     * 渲染当前页面
+     */
+    renderCurrentPage() {
+        if (!this.storyData) return;
+
+        const { story, images, voice } = this.storyData;
+        const text = story[this.currentPage];
+        const imageUrl = images[this.currentPage];
+        const audioUrl = voice && voice[this.currentPage];
+
+        // 清空容器
+        this.container.innerHTML = '';
+
+        // 创建当前页面
+        const pageElement = this.createPage(text, imageUrl, this.currentPage, audioUrl);
+        this.container.appendChild(pageElement);
+    }
+
+    /**
+     * 显示下一页
+     */
+    nextPage() {
+        if (!this.storyData) return false;
+        
+        if (this.currentPage < this.storyData.story.length - 1) {
+            this.currentPage++;
+            this.renderCurrentPage();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 显示上一页
+     */
+    prevPage() {
+        if (!this.storyData) return false;
+        
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            this.renderCurrentPage();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 跳转到指定页面
+     * @param {number} pageIndex - 页面索引
+     */
+    goToPage(pageIndex) {
+        if (!this.storyData) return false;
+        
+        if (pageIndex >= 0 && pageIndex < this.storyData.story.length) {
+            this.currentPage = pageIndex;
+            this.renderCurrentPage();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 获取当前页面索引
+     */
+    getCurrentPage() {
+        return this.currentPage;
+    }
+
+    /**
+     * 获取总页面数
+     */
+    getTotalPages() {
+        return this.storyData ? this.storyData.story.length : 0;
     }
 
     /**
@@ -32,9 +111,10 @@ export class StoryRenderer {
      * @param {string} text - 故事文本（包含中英文）
      * @param {string} imageUrl - 图片URL
      * @param {number} index - 页面索引
+     * @param {string} audioUrl - 音频URL（可选）
      * @returns {HTMLElement} 页面元素
      */
-    createPage(text, imageUrl, index) {
+    createPage(text, imageUrl, index, audioUrl = null) {
         const page = document.createElement('div');
         page.className = 'story-page';
         page.dataset.page = index;
@@ -45,7 +125,7 @@ export class StoryRenderer {
         // 创建页面内容
         page.innerHTML = `
             <div class="page-indicator">
-                <i class="fas fa-book-open"></i> 第 ${index + 1} 页
+                📖 第 ${index + 1} 页
             </div>
             
             <div class="story-image-container">
@@ -53,9 +133,9 @@ export class StoryRenderer {
             </div>
             
             <div class="story-text-container">
-                <div class="play-button" data-page="${index}" title="播放音频">
-                    <i class="fas fa-play"></i>
-                </div>
+                ${audioUrl ? `<div class="play-button" data-audio="${audioUrl}" title="播放音频">
+                    ▶️
+                </div>` : ''}
                 <div class="english-text">${this.escapeHtml(english)}</div>
                 <div class="chinese-text">${this.escapeHtml(chinese)}</div>
             </div>

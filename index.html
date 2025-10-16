@@ -4,116 +4,250 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI英文绘本 - 儿童故事</title>
-    <link rel="stylesheet" href="/css/tailwind.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fdf2f8 0%, #e0e7ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+            color: #374151;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 50%, #f59e0b 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 4px solid #c084fc;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 1rem;
+            border: 3px solid #c084fc;
+            border-radius: 0.75rem;
+            font-size: 1.125rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .input-group input:focus {
+            border-color: #f472b6;
+            box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            font-size: 1.125rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .empty-state .emoji {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .empty-state h3 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #8b5cf6;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            font-size: 1.25rem;
+            color: #6b7280;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-overlay.hidden {
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 min-h-screen">
+<body>
     <!-- 加载动画 -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-95 z-50 flex items-center justify-center hidden">
-        <div class="text-center">
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div style="text-align: center;">
             <div class="loading-spinner"></div>
-            <p class="mt-4 text-xl text-purple-600 font-bold">AI正在创作绘本...</p>
-            <p class="mt-2 text-gray-600">请稍等片刻 ✨</p>
+            <p style="margin-top: 1rem; font-size: 1.25rem; color: #8b5cf6; font-weight: bold;">AI正在创作绘本...</p>
+            <p style="margin-top: 0.5rem; color: #6b7280;">请稍等片刻 ✨</p>
         </div>
     </div>
 
-    <!-- 头部 -->
-    <header class="bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white py-6 shadow-lg">
-        <div class="container mx-auto px-4">
-            <h1 class="text-4xl font-bold text-center flex items-center justify-center gap-3">
-                <i class="fas fa-book-open"></i>
-                AI英文绘本故事
-                <i class="fas fa-magic"></i>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1>
+                📚 AI英文绘本故事 ✨
             </h1>
-        </div>
-    </header>
+        </header>
 
-    <!-- 主内容区 -->
-    <main class="container mx-auto px-4 py-8">
         <!-- 输入区域 -->
-        <div class="max-w-2xl mx-auto mb-8">
-            <div class="bg-white rounded-3xl shadow-xl p-6 border-4 border-purple-300">
-                <label class="block text-xl font-bold text-purple-700 mb-3 flex items-center gap-2">
-                    <i class="fas fa-pencil-alt"></i>
-                    告诉AI你想要什么故事：
-                </label>
-                <div class="flex gap-3">
-                    <input 
-                        type="text" 
-                        id="storyInput" 
-                        placeholder="例如：小猪、小兔子、恐龙..." 
-                        class="flex-1 px-4 py-3 border-3 border-purple-300 rounded-xl text-lg focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-200"
-                    >
-                    <button 
-                        id="generateBtn" 
-                        class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
-                    >
-                        <i class="fas fa-wand-magic-sparkles"></i>
-                        生成故事
-                    </button>
-                </div>
+        <div class="card">
+            <label style="display: block; font-size: 1.25rem; font-weight: bold; color: #8b5cf6; margin-bottom: 1rem;">
+                ✏️ 告诉AI你想要什么故事：
+            </label>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="storyInput" 
+                    placeholder="例如：小猪、小兔子、恐龙..."
+                >
+                <button 
+                    id="generateBtn" 
+                    class="btn"
+                >
+                    ✨ 生成故事
+                </button>
             </div>
         </div>
 
         <!-- 绘本展示区 -->
         <div id="storyContainer" class="hidden">
             <!-- 标题 -->
-            <div class="text-center mb-8">
-                <h2 id="storyTitle" class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2"></h2>
-                <div class="flex justify-center gap-2 mt-4">
-                    <span class="inline-block w-16 h-2 bg-purple-400 rounded-full"></span>
-                    <span class="inline-block w-16 h-2 bg-pink-400 rounded-full"></span>
-                    <span class="inline-block w-16 h-2 bg-yellow-400 rounded-full"></span>
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 id="storyTitle" style="font-size: 3rem; font-weight: bold; background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;"></h2>
+                <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem;">
+                    <span style="display: inline-block; width: 4rem; height: 0.5rem; background: #c084fc; border-radius: 9999px;"></span>
+                    <span style="display: inline-block; width: 4rem; height: 0.5rem; background: #f472b6; border-radius: 9999px;"></span>
+                    <span style="display: inline-block; width: 4rem; height: 0.5rem; background: #fbbf24; border-radius: 9999px;"></span>
                 </div>
             </div>
 
             <!-- 故事页面 -->
-            <div id="storyPages" class="max-w-5xl mx-auto"></div>
+            <div id="storyPages" style="max-width: 80rem; margin: 0 auto;"></div>
 
             <!-- 导航按钮 -->
-            <div class="flex justify-center items-center gap-6 mt-8">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; margin-top: 2rem;">
                 <button 
                     id="prevBtn" 
-                    class="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-6 py-3 rounded-full font-bold text-lg hover:shadow-lg transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    style="background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 9999px; font-weight: bold; font-size: 1.125rem; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;"
                 >
-                    <i class="fas fa-chevron-left"></i>
-                    上一页
+                    ⬅️ 上一页
                 </button>
-                <div class="text-2xl font-bold text-purple-700">
-                    <span id="currentPage">1</span> / <span id="totalPages">10</span>
+
+                <div style="background: white; border-radius: 9999px; padding: 0.75rem 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                    <span id="currentPage" style="font-size: 1.5rem; font-weight: bold; color: #8b5cf6;">1</span>
+                    <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+                    <span id="totalPages" style="font-size: 1.5rem; font-weight: bold; color: #8b5cf6;">1</span>
                 </div>
+
                 <button 
                     id="nextBtn" 
-                    class="bg-gradient-to-r from-green-400 to-green-600 text-white px-6 py-3 rounded-full font-bold text-lg hover:shadow-lg transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    style="background: linear-gradient(90deg, #f472b6 0%, #ec4899 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 9999px; font-weight: bold; font-size: 1.125rem; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;"
                 >
-                    下一页
-                    <i class="fas fa-chevron-right"></i>
+                    下一页 ➡️
                 </button>
             </div>
 
             <!-- 重新生成按钮 -->
-            <div class="text-center mt-8">
+            <div style="text-align: center; margin-top: 2rem;">
                 <button 
                     id="regenerateBtn" 
-                    class="bg-gradient-to-r from-orange-400 to-red-500 text-white px-8 py-3 rounded-full font-bold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
+                    style="background: linear-gradient(90deg, #10b981 0%, #059669 100%); color: white; padding: 1rem 2rem; border-radius: 9999px; font-weight: bold; font-size: 1.125rem; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; margin: 0 auto;"
                 >
-                    <i class="fas fa-redo"></i>
-                    重新生成故事
+                    🔄 重新生成故事
                 </button>
             </div>
         </div>
 
         <!-- 空状态提示 -->
-        <div id="emptyState" class="text-center py-16">
-            <div class="text-8xl mb-6">📚</div>
-            <h3 class="text-3xl font-bold text-purple-600 mb-4">开始创作你的故事吧！</h3>
-            <p class="text-xl text-gray-600">在上方输入框中输入你想要的故事主题</p>
+        <div id="emptyState" class="empty-state">
+            <div class="emoji">📚</div>
+            <h3>开始创作你的故事吧！</h3>
+            <p>在上方输入框中输入你想要的故事主题</p>
         </div>
-    </main>
+    </div>
 
     <!-- 音频播放器（隐藏） -->
-    <audio id="audioPlayer"></audio>
+    <audio id="audioPlayer" style="display: none;"></audio>
 
     <script type="module" src="main.js"></script>
 </body>

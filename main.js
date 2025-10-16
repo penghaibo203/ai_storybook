@@ -240,6 +240,8 @@ function displayStory(data) {
     }
     if (elements.storyContainer) {
         elements.storyContainer.classList.remove('hidden');
+        elements.storyContainer.classList.add('show'); // 添加show类来显示故事区域
+        console.log('✅ 故事容器已显示，添加了show类');
     }
 
     // 设置标题

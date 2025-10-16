@@ -60,6 +60,9 @@ function init() {
     // 添加装饰元素
     addDecorations();
     
+    // 移动端优化
+    optimizeForMobile();
+    
     console.log('✅ 应用初始化完成');
 }
 
@@ -91,21 +94,26 @@ function bindEvents() {
         if (playButton) {
             const audioUrl = playButton.dataset.audio;
             if (audioUrl) {
+                console.log('🎵 播放按钮被点击，音频URL:', audioUrl);
                 // 直接播放音频
                 if (!audioPlayer.paused && audioPlayer.src === audioUrl) {
+                    console.log('⏸️ 暂停音频');
                     audioPlayer.pause();
                     playButton.classList.remove('playing');
-                    playButton.textContent = '▶️';
+                    playButton.innerHTML = '▶️';
                 } else {
+                    console.log('▶️ 开始播放音频');
                     stopAudio();
                     audioPlayer.src = audioUrl;
                     audioPlayer.play().catch(error => {
-                        console.error('音频播放失败:', error);
+                        console.error('❌ 音频播放失败:', error);
                         alert('音频播放失败，请重试！');
                     });
                     playButton.classList.add('playing');
-                    playButton.textContent = '⏸️';
+                    playButton.innerHTML = '⏸️';
                 }
+            } else {
+                console.warn('⚠️ 播放按钮没有音频URL');
             }
         }
     });
@@ -296,7 +304,7 @@ function handlePlayAudio(pageIndex) {
         audioPlayer.pause();
         if (playButton) {
             playButton.classList.remove('playing');
-            playButton.textContent = '▶️';
+            playButton.innerHTML = '▶️';
         }
         return;
     }
@@ -314,7 +322,7 @@ function handlePlayAudio(pageIndex) {
     // 更新按钮状态
     if (playButton) {
         playButton.classList.add('playing');
-        playButton.textContent = '⏸️';
+        playButton.innerHTML = '⏸️';
     }
 }
 
@@ -329,7 +337,7 @@ function stopAudio() {
     const allPlayButtons = elements.storyPages.querySelectorAll('.play-button');
     allPlayButtons.forEach(btn => {
         btn.classList.remove('playing');
-        btn.textContent = '▶️';
+        btn.innerHTML = '▶️';
     });
 }
 
@@ -486,6 +494,94 @@ async function loadRecordById(recordId) {
         hideDecorations(); // 加载失败时隐藏装饰元素
     } finally {
         showLoading(false);
+    }
+}
+
+// 移动端优化
+function optimizeForMobile() {
+    // 检测是否为移动设备
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        console.log('📱 检测到移动设备，应用移动端优化');
+        
+        // 防止双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // 优化触摸反馈
+        const touchElements = document.querySelectorAll('.generate-btn, .nav-btn, .play-button, .action-btn');
+        touchElements.forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+        
+        // 优化输入框
+        if (elements.storyInput) {
+            elements.storyInput.addEventListener('focus', function() {
+                // 延迟滚动，确保键盘弹出后页面正确显示
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+        }
+        
+        // 优化音频播放（移动端需要用户交互才能播放）
+        if (audioPlayer) {
+            audioPlayer.addEventListener('canplaythrough', function() {
+                console.log('🎵 音频准备就绪');
+            });
+            
+            audioPlayer.addEventListener('error', function(e) {
+                console.error('❌ 音频加载失败:', e);
+            });
+        }
+        
+        // 添加触摸手势支持
+        let startX = 0;
+        let startY = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (!startX || !startY) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            // 水平滑动切换页面
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0 && elements.nextBtn && !elements.nextBtn.disabled) {
+                    // 向左滑动，下一页
+                    handleNextPage();
+                } else if (diffX < 0 && elements.prevBtn && !elements.prevBtn.disabled) {
+                    // 向右滑动，上一页
+                    handlePrevPage();
+                }
+            }
+            
+            startX = 0;
+            startY = 0;
+        });
+        
+        console.log('✅ 移动端优化完成');
     }
 }
 

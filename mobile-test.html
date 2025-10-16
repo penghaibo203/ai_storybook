@@ -4,247 +4,375 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>移动端测试 - AI英文绘本</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        .test-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            color: white;
+        }
+
+        .container {
             max-width: 100%;
             margin: 0 auto;
-            padding: 1rem;
-            background: linear-gradient(135deg, #fdf2f8 0%, #e0e7ff 50%, #dbeafe 100%);
-            min-height: 100vh;
         }
-        
+
         .test-section {
-            background: white;
-            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
             padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .test-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #1f2937;
-            margin-bottom: 1rem;
-            text-align: center;
         }
-        
+
+        .test-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #4c1d95;
+        }
+
         .test-item {
             margin-bottom: 1rem;
             padding: 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.8rem;
-            background: #f9fafb;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        
-        .test-label {
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        .device-info {
-            background: #dbeafe;
-            color: #1e40af;
+
+        .test-button {
+            width: 100%;
             padding: 1rem;
-            border-radius: 0.8rem;
-            margin-bottom: 1rem;
-            font-family: monospace;
-            font-size: 0.9rem;
-        }
-        
-        .responsive-demo {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        
-        .demo-card {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
-            padding: 1rem;
-            border-radius: 0.8rem;
-            text-align: center;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1rem;
             font-weight: 600;
-        }
-        
-        .touch-test {
-            background: #10b981;
-            color: white;
-            padding: 1rem;
-            border-radius: 0.8rem;
-            text-align: center;
-            margin: 0.5rem 0;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
         }
-        
-        .touch-test:active {
-            transform: scale(0.95);
-            background: #059669;
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        .test-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            -webkit-appearance: none;
+        }
+
+        .test-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .test-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            font-size: 0.9rem;
+            color: #065f46;
+        }
+
+        .test-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #991b1b;
+        }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+            transition: all 0.4s ease;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 auto;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+        }
+
+        .play-button.playing {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .device-info {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .swipe-hint {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
-    <div class="test-container">
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">📱 移动端功能测试</h1>
+        
+        <div class="device-info" id="deviceInfo">
+            正在检测设备信息...
+        </div>
+
+        <!-- 基础功能测试 -->
         <div class="test-section">
-            <h1 class="test-title">📱 移动端适配测试</h1>
+            <h2 class="test-title">🔧 基础功能测试</h2>
             
-            <div class="device-info" id="deviceInfo">
-                正在检测设备信息...
-            </div>
-        </div>
-        
-        <div class="test-section">
-            <h2 class="test-title">🎨 响应式布局测试</h2>
-            <div class="responsive-demo">
-                <div class="demo-card">卡片 1</div>
-                <div class="demo-card">卡片 2</div>
-                <div class="demo-card">卡片 3</div>
-                <div class="demo-card">卡片 4</div>
-            </div>
-        </div>
-        
-        <div class="test-section">
-            <h2 class="test-title">👆 触摸交互测试</h2>
-            <div class="touch-test" onclick="showTouchFeedback(this)">
-                点击测试 - 应该有缩放效果
-            </div>
-            <div class="touch-test" onclick="showTouchFeedback(this)">
-                长按测试 - 应该有触觉反馈
-            </div>
-        </div>
-        
-        <div class="test-section">
-            <h2 class="test-title">📏 字体大小测试</h2>
             <div class="test-item">
-                <span class="test-label">大标题 (2rem)</span>
-                <div style="font-size: 2rem; font-weight: 700; color: #1f2937;">AI英文绘本故事</div>
+                <h3>输入框测试</h3>
+                <input type="text" class="test-input" placeholder="请输入测试文本..." id="testInput">
+                <button class="test-button" onclick="testInput()">测试输入框</button>
+                <div class="test-result" id="inputResult" style="display: none;"></div>
             </div>
+
             <div class="test-item">
-                <span class="test-label">正文 (1rem)</span>
-                <div style="font-size: 1rem; color: #374151;">这是一段测试文本，用于验证在移动设备上的可读性。</div>
+                <h3>按钮交互测试</h3>
+                <button class="test-button" onclick="testButton()">点击测试按钮</button>
+                <div class="test-result" id="buttonResult" style="display: none;"></div>
             </div>
+
             <div class="test-item">
-                <span class="test-label">小字 (0.8rem)</span>
-                <div style="font-size: 0.8rem; color: #6b7280;">这是小字体的测试文本。</div>
+                <h3>触摸反馈测试</h3>
+                <button class="test-button" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform=''">触摸反馈测试</button>
             </div>
         </div>
-        
+
+        <!-- 音频播放测试 -->
         <div class="test-section">
-            <h2 class="test-title">🔘 按钮测试</h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                <button class="generate-btn" style="flex: 1; min-width: 120px;">生成故事</button>
-                <button class="regenerate-btn" style="flex: 1; min-width: 120px;">重新生成</button>
-                <button class="nav-btn" style="flex: 1; min-width: 120px;">上一页</button>
-                <button class="nav-btn" style="flex: 1; min-width: 120px;">下一页</button>
-            </div>
-        </div>
-        
-        <div class="test-section">
-            <h2 class="test-title">📝 输入框测试</h2>
+            <h2 class="test-title">🎵 音频播放测试</h2>
+            
             <div class="test-item">
-                <span class="test-label">故事主题输入</span>
-                <input type="text" class="story-input" placeholder="请输入故事主题..." style="width: 100%;">
+                <h3>音频播放按钮</h3>
+                <div class="play-button" id="audioTestBtn" onclick="testAudio()">▶️</div>
+                <div class="test-result" id="audioResult" style="display: none;"></div>
             </div>
         </div>
-        
+
+        <!-- 手势测试 -->
         <div class="test-section">
-            <h2 class="test-title">🎭 动画效果测试</h2>
+            <h2 class="test-title">👆 手势测试</h2>
+            
             <div class="test-item">
-                <div class="play-button" style="position: relative; display: inline-block;">
-                    <span style="color: white; font-size: 2rem;">▶️</span>
+                <h3>滑动测试</h3>
+                <p>在此区域左右滑动测试手势识别</p>
+                <div style="height: 100px; background: rgba(139, 92, 246, 0.1); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; margin: 1rem 0;" id="swipeArea">
+                    <span>滑动区域</span>
                 </div>
-                <div class="page-indicator" style="position: relative; display: inline-block; margin-left: 1rem;">
-                    第 1 页
-                </div>
+                <div class="test-result" id="swipeResult" style="display: none;"></div>
+                <div class="swipe-hint">💡 提示：向左滑动显示"下一页"，向右滑动显示"上一页"</div>
             </div>
         </div>
-        
+
+        <!-- 页面跳转测试 -->
         <div class="test-section">
-            <h2 class="test-title">📊 测试结果</h2>
-            <div id="testResults">
-                <div class="test-item">
-                    <span class="test-label">屏幕宽度</span>
-                    <div id="screenWidth">检测中...</div>
-                </div>
-                <div class="test-item">
-                    <span class="test-label">设备类型</span>
-                    <div id="deviceType">检测中...</div>
-                </div>
-                <div class="test-item">
-                    <span class="test-label">触摸支持</span>
-                    <div id="touchSupport">检测中...</div>
-                </div>
+            <h2 class="test-title">🔗 页面跳转测试</h2>
+            
+            <div class="test-item">
+                <button class="test-button" onclick="window.location.href='/'">🏠 返回主页</button>
+                <button class="test-button" onclick="window.location.href='/records.html'">📖 查看记录页面</button>
+            </div>
+        </div>
+
+        <!-- API测试 -->
+        <div class="test-section">
+            <h2 class="test-title">🌐 API连接测试</h2>
+            
+            <div class="test-item">
+                <button class="test-button" onclick="testAPI()">测试API连接</button>
+                <div class="test-result" id="apiResult" style="display: none;"></div>
             </div>
         </div>
     </div>
-    
+
     <script>
         // 设备信息检测
         function detectDevice() {
-            const deviceInfo = document.getElementById('deviceInfo');
-            const screenWidth = document.getElementById('screenWidth');
-            const deviceType = document.getElementById('deviceType');
-            const touchSupport = document.getElementById('touchSupport');
+            const userAgent = navigator.userAgent;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+            const isAndroid = /Android/.test(userAgent);
             
-            // 屏幕信息
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const pixelRatio = window.devicePixelRatio || 1;
+            let deviceType = '桌面设备';
+            if (isIOS) deviceType = 'iOS设备';
+            else if (isAndroid) deviceType = 'Android设备';
+            else if (isMobile) deviceType = '移动设备';
             
-            // 设备类型判断
-            let type = '桌面端';
-            if (width <= 360) {
-                type = '超小屏手机';
-            } else if (width <= 480) {
-                type = '小屏手机';
-            } else if (width <= 768) {
-                type = '手机';
-            } else if (width <= 1024) {
-                type = '平板';
+            const screenInfo = `屏幕: ${window.screen.width}x${window.screen.height}`;
+            const viewportInfo = `视口: ${window.innerWidth}x${window.innerHeight}`;
+            
+            document.getElementById('deviceInfo').innerHTML = `
+                <strong>设备类型:</strong> ${deviceType}<br>
+                <strong>${screenInfo}</strong><br>
+                <strong>${viewportInfo}</strong><br>
+                <strong>用户代理:</strong> ${userAgent.substring(0, 50)}...
+            `;
+        }
+
+        // 输入框测试
+        function testInput() {
+            const input = document.getElementById('testInput');
+            const result = document.getElementById('inputResult');
+            
+            if (input.value.trim()) {
+                result.textContent = `✅ 输入成功: "${input.value}"`;
+                result.className = 'test-result';
+            } else {
+                result.textContent = '❌ 请输入一些文本';
+                result.className = 'test-result test-error';
+            }
+            result.style.display = 'block';
+        }
+
+        // 按钮测试
+        function testButton() {
+            const result = document.getElementById('buttonResult');
+            result.textContent = '✅ 按钮点击成功！触摸反馈正常';
+            result.className = 'test-result';
+            result.style.display = 'block';
+        }
+
+        // 音频测试
+        function testAudio() {
+            const btn = document.getElementById('audioTestBtn');
+            const result = document.getElementById('audioResult');
+            
+            // 创建测试音频
+            const audio = new Audio();
+            audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT';
+            
+            if (btn.classList.contains('playing')) {
+                audio.pause();
+                btn.classList.remove('playing');
+                btn.innerHTML = '▶️';
+                result.textContent = '⏸️ 音频已暂停';
+            } else {
+                audio.play().then(() => {
+                    btn.classList.add('playing');
+                    btn.innerHTML = '⏸️';
+                    result.textContent = '✅ 音频播放成功！';
+                    result.className = 'test-result';
+                    
+                    // 3秒后自动停止
+                    setTimeout(() => {
+                        audio.pause();
+                        btn.classList.remove('playing');
+                        btn.innerHTML = '▶️';
+                    }, 3000);
+                }).catch(error => {
+                    result.textContent = `❌ 音频播放失败: ${error.message}`;
+                    result.className = 'test-result test-error';
+                });
             }
             
-            // 触摸支持检测
-            const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            
-            // 更新显示
-            deviceInfo.innerHTML = `
-                屏幕尺寸: ${width} × ${height}<br>
-                像素比: ${pixelRatio}<br>
-                用户代理: ${navigator.userAgent.substring(0, 50)}...
-            `;
-            
-            screenWidth.textContent = `${width}px`;
-            deviceType.textContent = type;
-            touchSupport.textContent = hasTouch ? '支持' : '不支持';
+            result.style.display = 'block';
         }
+
+        // 滑动测试
+        let startX = 0;
+        let startY = 0;
         
-        // 触摸反馈
-        function showTouchFeedback(element) {
-            element.style.transform = 'scale(0.95)';
-            element.style.background = '#059669';
+        document.getElementById('swipeArea').addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        document.getElementById('swipeArea').addEventListener('touchend', function(e) {
+            if (!startX || !startY) return;
             
-            setTimeout(() => {
-                element.style.transform = 'scale(1)';
-                element.style.background = '#10b981';
-            }, 150);
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            const result = document.getElementById('swipeResult');
+            
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    result.textContent = '➡️ 向左滑动检测到 - 下一页';
+                } else {
+                    result.textContent = '⬅️ 向右滑动检测到 - 上一页';
+                }
+                result.className = 'test-result';
+                result.style.display = 'block';
+            }
+            
+            startX = 0;
+            startY = 0;
+        });
+
+        // API测试
+        async function testAPI() {
+            const result = document.getElementById('apiResult');
+            result.textContent = '🔄 正在测试API连接...';
+            result.className = 'test-result';
+            result.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/records');
+                if (response.ok) {
+                    const data = await response.json();
+                    result.textContent = '✅ API连接成功！';
+                    result.className = 'test-result';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                result.textContent = `❌ API连接失败: ${error.message}`;
+                result.className = 'test-result test-error';
+            }
         }
-        
-        // 页面加载完成后执行检测
-        document.addEventListener('DOMContentLoaded', () => {
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
             detectDevice();
-            
-            // 监听窗口大小变化
-            window.addEventListener('resize', detectDevice);
-            
-            // 监听方向变化
-            window.addEventListener('orientationchange', () => {
-                setTimeout(detectDevice, 100);
-            });
+            console.log('📱 移动端测试页面已加载');
         });
     </script>
 </body>

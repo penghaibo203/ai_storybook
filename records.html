@@ -3,579 +3,649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>绘本生成记录 - AI英文绘本</title>
+    <title>我的绘本记录 - AI英文绘本</title>
     <style>
+        /* 基础样式重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #fdf2f8 0%, #e0e7ff 50%, #dbeafe 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #374151;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+
+        /* 头部样式 - 移动端优化 */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        /* 头部 */
-        header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-radius: 1rem;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        /* 导航按钮 */
-        .nav-buttons {
+
+        .header-content {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 100%;
         }
-        
-        .nav-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.75rem;
-            font-weight: 600;
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #4c1d95;
             text-decoration: none;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '📚';
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            background: rgba(139, 92, 246, 0.1);
         }
-        
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+
+        .nav-link:hover {
+            color: #4c1d95;
+            background: rgba(139, 92, 246, 0.2);
         }
-        
-        /* 统计卡片 */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+
+        /* 主容器 - 移动端优化 */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
         }
-        
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
+
+        /* 标题区域 - 移动端优化 */
+        .title-section {
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            color: white;
+            padding: 1rem 0;
         }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: #8b5cf6;
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #8b5cf6;
+
+        .main-title {
+            font-size: 2rem;
+            font-weight: 800;
             margin-bottom: 0.5rem;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
         }
-        
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        /* 统计信息 - 移动端优化 */
+        .stats-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4c1d95;
+            margin-bottom: 0.25rem;
+        }
+
         .stat-label {
+            font-size: 0.9rem;
             color: #6b7280;
             font-weight: 500;
         }
-        
-        /* 记录列表 */
-        .records-container {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+        /* 记录列表 - 移动端优化 */
+        .records-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .records-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #f3f4f6;
+            margin-bottom: 1.5rem;
         }
-        
+
         .records-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #1f2937;
         }
-        
+
         .refresh-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
+        .refresh-btn::before {
+            content: '🔄';
+            font-size: 1rem;
+        }
+
         .refresh-btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
         }
-        
-        /* 记录项 */
-        .record-item {
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 1rem;
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 记录卡片 - 移动端优化 */
+        .record-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+            border-radius: 1.5rem;
             padding: 1.5rem;
             margin-bottom: 1rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            cursor: pointer;
+            position: relative;
         }
-        
-        .record-item:hover {
-            border-color: #8b5cf6;
+
+        .record-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
         }
-        
+
         .record-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1rem;
         }
-        
+
         .record-title {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 0.25rem;
+            color: #7c3aed;
+            line-height: 1.3;
+            flex: 1;
+            margin-right: 1rem;
         }
-        
-        .record-date {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-        
-        .record-meta {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-        
-        .record-input {
-            background: white;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-            font-style: italic;
-        }
-        
+
         .record-actions {
             display: flex;
             gap: 0.5rem;
-            margin-top: 1rem;
+            flex-shrink: 0;
         }
-        
+
         .action-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem;
             border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
+            border-radius: 0.75rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            min-height: 40px;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
         .view-btn {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
-        
+
+        .view-btn::before {
+            content: '👁️';
+            font-size: 1rem;
+        }
+
         .delete-btn {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
         }
-        
+
+        .delete-btn::before {
+            content: '🗑️';
+            font-size: 1rem;
+        }
+
         .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn:active {
             transform: scale(1.05);
         }
-        
-        /* 空状态 */
+
+        .record-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .record-input {
+            font-size: 0.9rem;
+            color: #6b7280;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .record-input::before {
+            content: '💭 ';
+            margin-right: 0.25rem;
+        }
+
+        .record-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .record-date {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .record-date::before {
+            content: '📅';
+            font-size: 0.9rem;
+        }
+
+        .record-pages {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .record-pages::before {
+            content: '📄';
+            font-size: 0.9rem;
+        }
+
+        /* 空状态 - 移动端优化 */
         .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 3rem 1rem;
             color: #6b7280;
         }
-        
+
         .empty-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
+            opacity: 0.5;
         }
-        
+
         .empty-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.25rem;
+            font-weight: 600;
             margin-bottom: 0.5rem;
             color: #374151;
         }
-        
+
         .empty-description {
+            font-size: 1rem;
             margin-bottom: 2rem;
+            line-height: 1.5;
         }
-        
-        /* 加载状态 */
-        .loading {
+
+        .empty-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .create-story-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .create-story-btn::before {
+            content: '✨';
+            font-size: 1.2rem;
+        }
+
+        .create-story-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .create-story-btn:active {
+            transform: translateY(0);
+        }
+
+        .retry-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .retry-btn::before {
+            content: '🔄';
+            margin-right: 0.5rem;
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+        }
+
+        .retry-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 加载状态 - 移动端优化 */
+        .loading-state {
             text-align: center;
-            padding: 2rem;
+            padding: 3rem 1rem;
             color: #6b7280;
         }
-        
+
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid #e5e7eb;
+            border: 4px solid rgba(139, 92, 246, 0.3);
             border-top: 4px solid #8b5cf6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        /* 响应式设计 */
-        /* 响应式设计 - 移动端优化 */
-        
-        /* 平板端 (768px - 1024px) */
-        @media (max-width: 1024px) {
-            .container {
-                padding: 1.5rem;
-            }
-            
-            header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .stats-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 500;
         }
-        
-        /* 手机端 (768px以下) */
+
+        /* 移动端优化 */
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
+            .header {
+                padding: 0.75rem;
             }
             
-            /* 头部优化 */
-            header {
-                padding: 1.5rem 1rem;
-                margin-bottom: 1.5rem;
-                border-radius: 0.8rem;
-            }
-            
-            header h1 {
-                font-size: 1.8rem;
-                margin-bottom: 0.5rem;
-            }
-            
-            header p {
-                font-size: 1rem;
-            }
-            
-            /* 导航按钮优化 */
-            .nav-buttons {
-                flex-direction: column;
-                align-items: center;
-                margin-bottom: 1.5rem;
-            }
-            
-            .nav-btn {
-                padding: 0.8rem 1.2rem;
-                font-size: 0.9rem;
-                border-radius: 0.8rem;
-                margin: 0.3rem;
-                width: 100%;
-                max-width: 200px;
-            }
-            
-            /* 统计卡片优化 */
-            .stats-container {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-                margin-bottom: 1.5rem;
-            }
-            
-            .stat-card {
-                padding: 1.2rem;
-                border-radius: 0.8rem;
-            }
-            
-            .stat-number {
-                font-size: 1.8rem;
-            }
-            
-            .stat-label {
-                font-size: 0.9rem;
-            }
-            
-            /* 记录列表优化 */
-            .records-list {
-                gap: 1rem;
-            }
-            
-            .record-item {
-                padding: 1.2rem;
-                border-radius: 0.8rem;
-            }
-            
-            .record-header {
-                flex-direction: column;
-                gap: 0.5rem;
-                margin-bottom: 1rem;
-            }
-            
-            .record-title {
+            .logo {
                 font-size: 1.1rem;
-                margin-bottom: 0.8rem;
             }
             
-            .record-meta {
-                flex-direction: column;
-                gap: 0.5rem;
-                font-size: 0.85rem;
-                margin-bottom: 1rem;
+            .nav-link {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
             }
             
-            .record-actions {
-                gap: 0.5rem;
-            }
-            
-            .action-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.85rem;
-                border-radius: 0.6rem;
-            }
-            
-            /* 空状态优化 */
-            .empty-state {
-                padding: 2rem 1rem;
-            }
-            
-            .empty-state h3 {
-                font-size: 1.3rem;
-            }
-            
-            .empty-state p {
-                font-size: 1rem;
-            }
-            
-            /* 加载状态优化 */
-            .loading {
-                padding: 2rem 1rem;
-            }
-            
-            .loading-spinner {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .loading-text {
-                font-size: 1rem;
-            }
-        }
-        
-        /* 小屏手机 (480px以下) */
-        @media (max-width: 480px) {
             .container {
-                padding: 0.8rem;
+                padding: 0.75rem;
             }
             
-            /* 头部更紧凑 */
-            header {
-                padding: 1.2rem 0.8rem;
-                margin-bottom: 1.2rem;
+            .main-title {
+                font-size: 1.75rem;
             }
             
-            header h1 {
-                font-size: 1.6rem;
-            }
-            
-            header p {
+            .subtitle {
                 font-size: 0.9rem;
             }
             
-            /* 导航按钮更小 */
-            .nav-btn {
-                padding: 0.7rem 1rem;
-                font-size: 0.8rem;
-                margin: 0.2rem;
+            .stats-section {
+                padding: 1.25rem;
             }
             
-            /* 统计卡片更紧凑 */
-            .stat-card {
-                padding: 1rem;
+            .stats-grid {
+                gap: 0.75rem;
+            }
+            
+            .stat-item {
+                padding: 0.75rem;
             }
             
             .stat-number {
-                font-size: 1.6rem;
+                font-size: 1.25rem;
             }
             
             .stat-label {
                 font-size: 0.8rem;
             }
             
-            /* 记录项更紧凑 */
-            .record-item {
-                padding: 1rem;
+            .records-section {
+                padding: 1.25rem;
+            }
+            
+            .records-title {
+                font-size: 1.1rem;
+            }
+            
+            .record-card {
+                padding: 1.25rem;
             }
             
             .record-title {
                 font-size: 1rem;
-                margin-bottom: 0.6rem;
             }
             
-            .record-meta {
-                font-size: 0.8rem;
-                margin-bottom: 0.8rem;
-            }
-            
-            .record-actions {
-                flex-direction: column;
-                gap: 0.4rem;
-            }
-            
-            .action-btn {
-                padding: 0.5rem 0.8rem;
-                font-size: 0.8rem;
-                width: 100%;
-                text-align: center;
-            }
-            
-            /* 空状态更紧凑 */
-            .empty-state {
-                padding: 1.5rem 0.8rem;
-            }
-            
-            .empty-state h3 {
-                font-size: 1.2rem;
-            }
-            
-            .empty-state p {
-                font-size: 0.9rem;
-            }
-        }
-        
-        /* 超小屏手机 (360px以下) */
-        @media (max-width: 360px) {
-            .container {
-                padding: 0.5rem;
-            }
-            
-            header h1 {
-                font-size: 1.4rem;
-            }
-            
-            .stat-number {
-                font-size: 1.4rem;
-            }
-            
-            .record-title {
-                font-size: 0.95rem;
+            .record-input {
+                font-size: 0.85rem;
             }
             
             .record-meta {
                 font-size: 0.75rem;
             }
         }
+
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 1.5rem;
+            }
+            
+            .stats-section {
+                padding: 1rem;
+            }
+            
+            .records-section {
+                padding: 1rem;
+            }
+            
+            .record-card {
+                padding: 1rem;
+            }
+            
+            .record-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .record-title {
+                margin-right: 0;
+            }
+            
+            .record-actions {
+                align-self: flex-end;
+            }
+            
+            .empty-state {
+                padding: 2rem 1rem;
+            }
+            
+            .empty-icon {
+                font-size: 3rem;
+            }
+            
+            .empty-title {
+                font-size: 1.1rem;
+            }
+            
+            .empty-description {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 触摸优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .refresh-btn, .action-btn, .create-story-btn, .retry-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* 防止缩放和选择 */
+        @media (max-width: 768px) {
+            body {
+                -webkit-user-select: none;
+                -webkit-touch-callout: none;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+        }
+
+        /* 滚动优化 */
+        @media (max-width: 768px) {
+            body {
+                -webkit-overflow-scrolling: touch;
+                overflow-x: hidden;
+            }
+        }
+
+        /* 安全区域适配 */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+            
+            .container {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">AI英文绘本</a>
+            <a href="/" class="nav-link">🏠 返回首页</a>
+        </div>
+    </header>
+
+    <!-- 主容器 -->
     <div class="container">
-        <!-- 头部 -->
-        <header>
-            <h1>📚 绘本生成记录</h1>
-            <p>查看和管理您创建的所有AI绘本故事</p>
-        </header>
-        
-        <!-- 导航按钮 -->
-        <div class="nav-buttons">
-            <a href="/" class="nav-btn">
-                🏠 返回首页
-            </a>
-            <a href="/" class="nav-btn">
-                ✨ 创建新绘本
-            </a>
+        <!-- 标题区域 -->
+        <div class="title-section">
+            <h1 class="main-title">📖 我的绘本记录</h1>
+            <p class="subtitle">查看和管理您创作的所有绘本故事</p>
         </div>
-        
+
         <!-- 统计信息 -->
-        <div class="stats-container" id="statsContainer">
-            <div class="stat-card">
-                <div class="stat-number" id="totalRecords">-</div>
-                <div class="stat-label">总绘本数</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="thisMonthRecords">-</div>
-                <div class="stat-label">本月创建</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalPages">-</div>
-                <div class="stat-label">总页数</div>
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div id="totalStories" class="stat-number">0</div>
+                    <div class="stat-label">总故事数</div>
+                </div>
+                <div class="stat-item">
+                    <div id="lastGenerated" class="stat-label">最近创作</div>
+                    <div id="lastDate" class="stat-number" style="font-size: 0.9rem;">暂无</div>
+                </div>
             </div>
         </div>
-        
+
         <!-- 记录列表 -->
-        <div class="records-container">
+        <div class="records-section">
             <div class="records-header">
-                <h2 class="records-title">📖 我的绘本</h2>
-                <button class="refresh-btn" onclick="loadRecords()">
-                    🔄 刷新
-                </button>
+                <h2 class="records-title">📚 绘本列表</h2>
+                <button id="refreshBtn" class="refresh-btn">刷新</button>
             </div>
-            
-            <div id="recordsList">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>正在加载绘本记录...</p>
-                </div>
+
+            <!-- 记录容器 -->
+            <div id="recordsContainer">
+                <!-- 动态生成记录 -->
             </div>
         </div>
     </div>
@@ -583,250 +653,226 @@
     <script>
         // 全局变量
         let records = [];
-        let stats = {};
+        let isLoading = false;
 
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', () => {
+        // DOM元素
+        const elements = {
+            recordsContainer: document.getElementById('recordsContainer'),
+            refreshBtn: document.getElementById('refreshBtn'),
+            totalStories: document.getElementById('totalStories'),
+            lastGenerated: document.getElementById('lastGenerated'),
+            lastDate: document.getElementById('lastDate')
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 绘本记录页面初始化');
             loadRecords();
+            bindEvents();
+        });
+
+        // 绑定事件
+        function bindEvents() {
+            elements.refreshBtn.addEventListener('click', loadRecords);
             
-            // 添加全局事件监听器
+            // 使用事件委托处理动态元素
+            elements.recordsContainer.addEventListener('click', function(e) {
+                const target = e.target.closest('[data-record-id]');
+                if (!target) return;
+                
+                const recordId = target.getAttribute('data-record-id');
+                const action = target.getAttribute('data-action');
+                
+                if (action === 'view') {
+                    viewRecord(recordId);
+                } else if (action === 'delete') {
+                    deleteRecord(recordId);
+                }
+            });
+
+            // 空状态按钮事件
             document.addEventListener('click', function(e) {
                 if (e.target.id === 'retryBtn') {
                     loadRecords();
+                } else if (e.target.id === 'createStoryBtn') {
+                    window.location.href = '/';
                 }
             });
-        });
+        }
 
-        // 加载记录列表
+        // 加载记录
         async function loadRecords() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            showLoading();
+            
             try {
-                showLoading();
-                
+                console.log('📚 开始加载绘本记录...');
                 const response = await fetch('/api/records');
+                
                 if (!response.ok) {
-                    throw new Error('获取记录失败');
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const result = await response.json();
+                console.log('✅ 绘本记录加载成功:', result);
+                
                 if (result.success) {
-                    records = result.data.records;
-                    stats = result.data.stats;
-                    updateStats();
+                    records = result.data.records || [];
+                    updateStats(result.data.stats || {});
                     renderRecords();
                 } else {
-                    throw new Error(result.error || '获取记录失败');
+                    throw new Error(result.error || '加载记录失败');
                 }
+                
             } catch (error) {
-                console.error('加载记录失败:', error);
-                showError('加载记录失败: ' + error.message);
+                console.error('❌ 加载绘本记录失败:', error);
+                showError('加载记录失败，请重试');
+            } finally {
+                isLoading = false;
+                hideLoading();
             }
         }
 
         // 显示加载状态
         function showLoading() {
-            document.getElementById('recordsList').innerHTML = `
-                <div class="loading">
+            elements.recordsContainer.innerHTML = `
+                <div class="loading-state">
                     <div class="loading-spinner"></div>
-                    <p>正在加载绘本记录...</p>
+                    <div class="loading-text">正在加载绘本记录...</div>
                 </div>
             `;
         }
 
-        // 显示错误信息
+        // 隐藏加载状态
+        function hideLoading() {
+            // 加载状态会被renderRecords()或showError()替换
+        }
+
+        // 显示错误状态
         function showError(message) {
-            document.getElementById('recordsList').innerHTML = `
+            elements.recordsContainer.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">❌</div>
+                    <div class="empty-icon">😞</div>
                     <div class="empty-title">加载失败</div>
                     <div class="empty-description">${message}</div>
-                    <button class="nav-btn" id="retryBtn">重试</button>
+                    <div class="empty-actions">
+                        <button id="retryBtn" class="retry-btn">重试</button>
+                    </div>
                 </div>
             `;
         }
 
         // 更新统计信息
-        function updateStats() {
-            document.getElementById('totalRecords').textContent = stats.total || 0;
-            document.getElementById('thisMonthRecords').textContent = stats.thisMonth || 0;
-            document.getElementById('totalPages').textContent = stats.totalPages || 0;
+        function updateStats(stats) {
+            elements.totalStories.textContent = stats.totalStories || 0;
+            
+            if (stats.lastGenerated) {
+                const date = new Date(stats.lastGenerated);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    elements.lastDate.textContent = '今天';
+                } else if (diffDays === 2) {
+                    elements.lastDate.textContent = '昨天';
+                } else if (diffDays <= 7) {
+                    elements.lastDate.textContent = `${diffDays - 1}天前`;
+                } else {
+                    elements.lastDate.textContent = date.toLocaleDateString();
+                }
+            } else {
+                elements.lastDate.textContent = '暂无';
+            }
         }
 
         // 渲染记录列表
         function renderRecords() {
-            const recordsList = document.getElementById('recordsList');
-            
-            if (records.length === 0) {
-                recordsList.innerHTML = `
+            if (!records || records.length === 0) {
+                elements.recordsContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">📚</div>
                         <div class="empty-title">还没有绘本记录</div>
-                        <div class="empty-description">去创建您的第一个AI绘本故事吧！</div>
-                        <a href="/" class="nav-btn" id="createStoryBtn">✨ 创建绘本</a>
+                        <div class="empty-description">开始创作您的第一个AI绘本故事吧！</div>
+                        <div class="empty-actions">
+                            <a href="/" id="createStoryBtn" class="create-story-btn">开始创作</a>
+                        </div>
                     </div>
                 `;
                 return;
             }
 
-            recordsList.innerHTML = records.map(record => `
-                <div class="record-item" data-record-id="${record.id}">
-                    <div class="record-header">
-                        <div>
-                            <div class="record-title">${escapeHtml(record.title)}</div>
-                            <div class="record-date">${formatDate(record.createdAt || record.generatedAt)}</div>
+            const recordsHTML = records.map(record => {
+                const date = new Date(record.generatedAt || record.createdAt);
+                const formattedDate = date.toLocaleDateString();
+                const formattedTime = date.toLocaleTimeString('zh-CN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                return `
+                    <div class="record-card">
+                        <div class="record-header">
+                            <div class="record-title">${record.title || '无标题故事'}</div>
+                            <div class="record-actions">
+                                <button class="action-btn view-btn" data-record-id="${record.id}" data-action="view" title="查看绘本">查看绘本</button>
+                                <button class="action-btn delete-btn" data-record-id="${record.id}" data-action="delete" title="删除记录">删除</button>
+                            </div>
+                        </div>
+                        <div class="record-info">
+                            <div class="record-input">${record.input || record.inputPrompt || '未知'}</div>
+                            <div class="record-meta">
+                                <div class="record-date">${formattedDate} ${formattedTime}</div>
+                                <div class="record-pages">${record.story ? record.story.length : 0} 页</div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="record-meta">
-                        <div class="meta-item">
-                            📄 ${record.story ? record.story.length : 0} 页
-                        </div>
-                        <div class="meta-item">
-                            🎨 ${record.images ? record.images.length : 0} 张图片
-                        </div>
-                        <div class="meta-item">
-                            🔊 ${record.voice ? record.voice.length : 0} 个音频
-                        </div>
-                    </div>
-                    
-                    <div class="record-input">
-                        <strong>主题:</strong> ${escapeHtml(record.input || record.inputPrompt || '未知')}
-                    </div>
-                    
-                    <div class="record-actions">
-                        <button class="action-btn view-btn" data-record-id="${record.id}">
-                            👁️ 查看绘本
-                        </button>
-                        <button class="action-btn delete-btn" data-record-id="${record.id}">
-                            🗑️ 删除
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-            
-            // 添加事件监听器
-            addEventListeners();
+                `;
+            }).join('');
+
+            elements.recordsContainer.innerHTML = recordsHTML;
         }
 
-        // 添加事件监听器
-        function addEventListeners() {
-            // 记录项点击事件
-            document.querySelectorAll('.record-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    // 如果点击的是按钮，不触发记录项点击
-                    if (e.target.closest('.record-actions')) {
-                        return;
-                    }
-                    const recordId = this.getAttribute('data-record-id');
-                    viewRecord(recordId);
-                });
-            });
-            
-            // 查看按钮点击事件
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const recordId = this.getAttribute('data-record-id');
-                    viewRecord(recordId);
-                });
-            });
-            
-            // 删除按钮点击事件
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const recordId = this.getAttribute('data-record-id');
-                    deleteRecord(recordId);
-                });
-            });
-        }
-
-        // 查看记录详情
-        function viewRecord(id) {
-            console.log('🔍 点击查看记录:', id);
-            // 跳转到主页面并传递记录ID
-            window.location.href = `/?record=${id}`;
+        // 查看记录
+        function viewRecord(recordId) {
+            console.log('👁️ 查看绘本记录:', recordId);
+            window.location.href = `/?record=${recordId}`;
         }
 
         // 删除记录
-        async function deleteRecord(id) {
+        async function deleteRecord(recordId) {
             if (!confirm('确定要删除这个绘本记录吗？删除后无法恢复。')) {
                 return;
             }
 
             try {
-                const response = await fetch(`/api/records/${id}`, {
+                console.log('🗑️ 删除绘本记录:', recordId);
+                const response = await fetch(`/api/records/${recordId}`, {
                     method: 'DELETE'
                 });
-                
+
                 if (!response.ok) {
-                    throw new Error('删除失败');
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
+
                 const result = await response.json();
+                console.log('✅ 删除结果:', result);
+
                 if (result.success) {
-                    showNotification('绘本记录删除成功', 'success');
-                    loadRecords(); // 重新加载列表
+                    // 从本地数组中移除
+                    records = records.filter(record => record.id !== recordId);
+                    renderRecords();
+                    updateStats({ totalStories: records.length });
                 } else {
                     throw new Error(result.error || '删除失败');
                 }
+
             } catch (error) {
-                console.error('删除记录失败:', error);
-                showNotification('删除失败: ' + error.message, 'error');
+                console.error('❌ 删除绘本记录失败:', error);
+                alert('删除失败，请重试');
             }
-        }
-
-        // 格式化日期
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 1) {
-                return '昨天';
-            } else if (diffDays < 7) {
-                return `${diffDays} 天前`;
-            } else {
-                return date.toLocaleDateString('zh-CN', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-            }
-        }
-
-        // HTML转义
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // 显示通知
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-0 opacity-100 z-50 ${
-                type === 'success' ? 'bg-green-500' :
-                type === 'error' ? 'bg-red-500' :
-                'bg-blue-500'
-            } text-white max-w-md`;
-            
-            notification.innerHTML = `
-                <div class="flex items-start gap-3">
-                    <div class="flex-1">${message}</div>
-                    <button class="text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
-                        ✕
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
         }
     </script>
 </body>

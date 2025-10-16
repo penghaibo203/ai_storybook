@@ -144,7 +144,7 @@ function bindEvents() {
 
 // 处理生成故事
 async function handleGenerate() {
-    const input = elements.storyInput.value.trim();
+    const input = elements.storyInput ? elements.storyInput.value.trim() : '';
     
     if (!input) {
         alert('请输入故事主题！');
@@ -195,12 +195,16 @@ async function handleGenerate() {
 
 // 处理重新生成
 function handleRegenerate() {
-    const input = elements.storyInput.value.trim();
+    const input = elements.storyInput ? elements.storyInput.value.trim() : '';
     if (input) {
         handleGenerate();
     } else {
-        elements.storyContainer.classList.add('hidden');
-        elements.emptyState.classList.remove('hidden');
+        if (elements.storyContainer) {
+            elements.storyContainer.classList.add('hidden');
+        }
+        if (elements.emptyState) {
+            elements.emptyState.classList.remove('hidden');
+        }
     }
 }
 
@@ -213,11 +217,17 @@ function displayStory(data) {
     }
 
     // 隐藏空状态，显示故事容器
-    elements.emptyState.classList.add('hidden');
-    elements.storyContainer.classList.remove('hidden');
+    if (elements.emptyState) {
+        elements.emptyState.classList.add('hidden');
+    }
+    if (elements.storyContainer) {
+        elements.storyContainer.classList.remove('hidden');
+    }
 
     // 设置标题
-    elements.storyTitle.textContent = data.title || '我的故事';
+    if (elements.storyTitle) {
+        elements.storyTitle.textContent = data.title || '我的故事';
+    }
 
     // 渲染故事页面
     storyRenderer.render(data);
@@ -241,21 +251,29 @@ function showPage(pageIndex) {
     currentPage = pageIndex;
 
     // 隐藏所有页面
-    const allPages = elements.storyPages.querySelectorAll('.story-page');
-    allPages.forEach(page => page.classList.remove('active'));
+    if (elements.storyPages) {
+        const allPages = elements.storyPages.querySelectorAll('.story-page');
+        allPages.forEach(page => page.classList.remove('active'));
 
-    // 显示当前页面
-    const currentPageElement = allPages[pageIndex];
-    if (currentPageElement) {
-        currentPageElement.classList.add('active');
+        // 显示当前页面
+        const currentPageElement = allPages[pageIndex];
+        if (currentPageElement) {
+            currentPageElement.classList.add('active');
+        }
     }
 
     // 更新页码显示
-    elements.currentPageSpan.textContent = pageIndex + 1;
+    if (elements.currentPageSpan) {
+        elements.currentPageSpan.textContent = pageIndex + 1;
+    }
 
     // 更新按钮状态
-    elements.prevBtn.disabled = pageIndex === 0;
-    elements.nextBtn.disabled = pageIndex === totalPages - 1;
+    if (elements.prevBtn) {
+        elements.prevBtn.disabled = pageIndex === 0;
+    }
+    if (elements.nextBtn) {
+        elements.nextBtn.disabled = pageIndex === totalPages - 1;
+    }
 
     // 停止当前音频
     stopAudio();
@@ -362,11 +380,13 @@ function stopAudio() {
     audioPlayer.currentTime = 0;
 
     // 重置所有播放按钮
-    const allPlayButtons = elements.storyPages.querySelectorAll('.play-button');
-    allPlayButtons.forEach(btn => {
-        btn.classList.remove('playing');
-        btn.innerHTML = '▶️';
-    });
+    if (elements.storyPages) {
+        const allPlayButtons = elements.storyPages.querySelectorAll('.play-button');
+        allPlayButtons.forEach(btn => {
+            btn.classList.remove('playing');
+            btn.innerHTML = '▶️';
+        });
+    }
 }
 
 // 音频播放结束处理
@@ -377,12 +397,14 @@ function handleAudioEnded() {
 // 显示/隐藏加载动画
 function showLoading(show) {
     console.log(`🔄 设置加载状态: ${show ? '显示' : '隐藏'}`);
-    if (show) {
-        elements.loadingOverlay.classList.remove('hidden');
-        console.log('✅ 加载覆盖层已显示');
-    } else {
-        elements.loadingOverlay.classList.add('hidden');
-        console.log('✅ 加载覆盖层已隐藏');
+    if (elements.loadingOverlay) {
+        if (show) {
+            elements.loadingOverlay.classList.remove('hidden');
+            console.log('✅ 加载覆盖层已显示');
+        } else {
+            elements.loadingOverlay.classList.add('hidden');
+            console.log('✅ 加载覆盖层已隐藏');
+        }
     }
 }
 
@@ -495,8 +517,10 @@ async function loadRecordById(recordId) {
             console.log('📋 记录数据结构:', record);
             
             // 设置输入框的值
-            elements.storyInput.value = record.input || record.inputPrompt || '';
-            console.log('📝 设置输入框值:', elements.storyInput.value);
+            if (elements.storyInput) {
+                elements.storyInput.value = record.input || record.inputPrompt || '';
+                console.log('📝 设置输入框值:', elements.storyInput.value);
+            }
             
             // 显示故事
             currentStoryData = {

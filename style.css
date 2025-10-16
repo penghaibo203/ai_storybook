@@ -510,6 +510,7 @@ input:focus {
     position: fixed;
     pointer-events: none;
     z-index: 0;
+    display: none; /* 初始隐藏，只有在绘本加载成功后才显示 */
 }
 
 .star {

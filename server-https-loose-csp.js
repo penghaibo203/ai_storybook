@@ -19,9 +19,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 
-// 完全禁用CSP进行调试
+// 宽松的CSP策略
+const cspDirectives = {
+  defaultSrc: ["'self'"],
+  styleSrc: ["'self'", "'unsafe-inline'", "https:", "http:"],
+  scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:", "blob:"],
+  scriptSrcElem: ["'self'", "'unsafe-inline'", "https:", "http:", "blob:"],
+  fontSrc: ["'self'", "https:", "http:"],
+  imgSrc: ["'self'", "data:", "https:", "http:"],
+  connectSrc: ["'self'", "https:", "http:"],
+  mediaSrc: ["'self'", "https:", "http:"],
+  workerSrc: ["'self'", "blob:"],
+  childSrc: ["'self'", "blob:"],
+  frameAncestors: ["'none'"],
+  baseUri: ["'self'"],
+  formAction: ["'self'"],
+  objectSrc: ["'none'"],
+  scriptSrcAttr: ["'none'"]
+};
+
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: cspDirectives
+  },
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
   originAgentCluster: false
 }));
@@ -85,7 +105,7 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
-    csp: 'disabled'
+    csp: 'loose'
   });
 });
 
@@ -274,7 +294,7 @@ async function generateStory(input) {
 // 启动HTTP服务器
 const httpServer = app.listen(PORT, () => {
   console.log(`🌐 HTTP服务器运行在端口 ${PORT}`);
-  console.log(`📱 访问地址: http://localhost:${PORT}`);
+  console.log(`📱 访问地址: http://localhost:3000`);
 });
 
 // 启动HTTPS服务器

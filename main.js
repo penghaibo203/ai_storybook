@@ -151,6 +151,7 @@ async function handleGenerate() {
     } catch (error) {
         console.error('生成故事失败:', error);
         showLoading(false);
+        hideDecorations(); // 生成失败时隐藏装饰元素
         
         // 更友好的错误提示
         if (error.message.includes('认证失败') || error.message.includes('401')) {
@@ -176,6 +177,7 @@ function handleRegenerate() {
 function displayStory(data) {
     if (!data || !data.story || !data.images) {
         alert('故事数据格式错误！');
+        hideDecorations(); // 隐藏装饰元素
         return;
     }
 
@@ -191,6 +193,9 @@ function displayStory(data) {
 
     // 更新页面显示
     updatePageDisplay();
+
+    // 显示装饰元素
+    showDecorations();
 }
 
 // 显示指定页面
@@ -377,10 +382,16 @@ function showNotification(message, type = 'info') {
 
 // 添加装饰元素
 function addDecorations() {
+    // 检查是否已经存在装饰元素
+    if (document.querySelector('.star-decoration')) {
+        return;
+    }
+
     const decorations = ['⭐', '✨', '🌟', '💫', '🎨', '🎭', '🎪', '🎡'];
     const container = document.createElement('div');
     container.className = 'star-decoration';
-    
+    container.style.display = 'none'; // 初始隐藏
+
     for (let i = 0; i < 15; i++) {
         const star = document.createElement('div');
         star.className = 'star';
@@ -390,8 +401,26 @@ function addDecorations() {
         star.style.animationDelay = Math.random() * 3 + 's';
         container.appendChild(star);
     }
-    
+
     document.body.appendChild(container);
+}
+
+// 显示装饰元素
+function showDecorations() {
+    const decorationContainer = document.querySelector('.star-decoration');
+    if (decorationContainer) {
+        decorationContainer.style.display = 'block';
+        console.log('✨ 装饰元素已显示');
+    }
+}
+
+// 隐藏装饰元素
+function hideDecorations() {
+    const decorationContainer = document.querySelector('.star-decoration');
+    if (decorationContainer) {
+        decorationContainer.style.display = 'none';
+        console.log('✨ 装饰元素已隐藏');
+    }
 }
 
 // 检查URL参数中的记录ID
@@ -444,6 +473,7 @@ async function loadRecordById(recordId) {
     } catch (error) {
         console.error('❌ 加载历史记录失败:', error);
         showNotification(`加载历史记录失败: ${error.message}`, 'error');
+        hideDecorations(); // 加载失败时隐藏装饰元素
     } finally {
         showLoading(false);
     }

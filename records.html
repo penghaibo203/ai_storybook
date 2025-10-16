@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>绘本生成记录 - AI英文绘本</title>
     <style>
         * {
@@ -282,32 +282,248 @@
         }
         
         /* 响应式设计 */
+        /* 响应式设计 - 移动端优化 */
+        
+        /* 平板端 (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* 手机端 (768px以下) */
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
             }
             
-            header h1 {
-                font-size: 2rem;
+            /* 头部优化 */
+            header {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1.5rem;
+                border-radius: 0.8rem;
             }
             
+            header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            /* 导航按钮优化 */
             .nav-buttons {
                 flex-direction: column;
                 align-items: center;
+                margin-bottom: 1.5rem;
             }
             
+            .nav-btn {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.9rem;
+                border-radius: 0.8rem;
+                margin: 0.3rem;
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            /* 统计卡片优化 */
             .stats-container {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .stat-card {
+                padding: 1.2rem;
+                border-radius: 0.8rem;
+            }
+            
+            .stat-number {
+                font-size: 1.8rem;
+            }
+            
+            .stat-label {
+                font-size: 0.9rem;
+            }
+            
+            /* 记录列表优化 */
+            .records-list {
+                gap: 1rem;
+            }
+            
+            .record-item {
+                padding: 1.2rem;
+                border-radius: 0.8rem;
             }
             
             .record-header {
                 flex-direction: column;
                 gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .record-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.8rem;
             }
             
             .record-meta {
                 flex-direction: column;
                 gap: 0.5rem;
+                font-size: 0.85rem;
+                margin-bottom: 1rem;
+            }
+            
+            .record-actions {
+                gap: 0.5rem;
+            }
+            
+            .action-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+                border-radius: 0.6rem;
+            }
+            
+            /* 空状态优化 */
+            .empty-state {
+                padding: 2rem 1rem;
+            }
+            
+            .empty-state h3 {
+                font-size: 1.3rem;
+            }
+            
+            .empty-state p {
+                font-size: 1rem;
+            }
+            
+            /* 加载状态优化 */
+            .loading {
+                padding: 2rem 1rem;
+            }
+            
+            .loading-spinner {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .loading-text {
+                font-size: 1rem;
+            }
+        }
+        
+        /* 小屏手机 (480px以下) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.8rem;
+            }
+            
+            /* 头部更紧凑 */
+            header {
+                padding: 1.2rem 0.8rem;
+                margin-bottom: 1.2rem;
+            }
+            
+            header h1 {
+                font-size: 1.6rem;
+            }
+            
+            header p {
+                font-size: 0.9rem;
+            }
+            
+            /* 导航按钮更小 */
+            .nav-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.8rem;
+                margin: 0.2rem;
+            }
+            
+            /* 统计卡片更紧凑 */
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 1.6rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
+            
+            /* 记录项更紧凑 */
+            .record-item {
+                padding: 1rem;
+            }
+            
+            .record-title {
+                font-size: 1rem;
+                margin-bottom: 0.6rem;
+            }
+            
+            .record-meta {
+                font-size: 0.8rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .record-actions {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            
+            .action-btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+                width: 100%;
+                text-align: center;
+            }
+            
+            /* 空状态更紧凑 */
+            .empty-state {
+                padding: 1.5rem 0.8rem;
+            }
+            
+            .empty-state h3 {
+                font-size: 1.2rem;
+            }
+            
+            .empty-state p {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* 超小屏手机 (360px以下) */
+        @media (max-width: 360px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .stat-number {
+                font-size: 1.4rem;
+            }
+            
+            .record-title {
+                font-size: 0.95rem;
+            }
+            
+            .record-meta {
+                font-size: 0.75rem;
             }
         }
     </style>

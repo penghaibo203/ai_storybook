@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>移动端测试 - AI英文绘本</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .test-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            background: linear-gradient(135deg, #fdf2f8 0%, #e0e7ff 50%, #dbeafe 100%);
+            min-height: 100vh;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .test-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.8rem;
+            background: #f9fafb;
+        }
+        
+        .test-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .device-info {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            margin-bottom: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .responsive-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .demo-card {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .touch-test {
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            text-align: center;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .touch-test:active {
+            transform: scale(0.95);
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-section">
+            <h1 class="test-title">📱 移动端适配测试</h1>
+            
+            <div class="device-info" id="deviceInfo">
+                正在检测设备信息...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">🎨 响应式布局测试</h2>
+            <div class="responsive-demo">
+                <div class="demo-card">卡片 1</div>
+                <div class="demo-card">卡片 2</div>
+                <div class="demo-card">卡片 3</div>
+                <div class="demo-card">卡片 4</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">👆 触摸交互测试</h2>
+            <div class="touch-test" onclick="showTouchFeedback(this)">
+                点击测试 - 应该有缩放效果
+            </div>
+            <div class="touch-test" onclick="showTouchFeedback(this)">
+                长按测试 - 应该有触觉反馈
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">📏 字体大小测试</h2>
+            <div class="test-item">
+                <span class="test-label">大标题 (2rem)</span>
+                <div style="font-size: 2rem; font-weight: 700; color: #1f2937;">AI英文绘本故事</div>
+            </div>
+            <div class="test-item">
+                <span class="test-label">正文 (1rem)</span>
+                <div style="font-size: 1rem; color: #374151;">这是一段测试文本，用于验证在移动设备上的可读性。</div>
+            </div>
+            <div class="test-item">
+                <span class="test-label">小字 (0.8rem)</span>
+                <div style="font-size: 0.8rem; color: #6b7280;">这是小字体的测试文本。</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">🔘 按钮测试</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <button class="generate-btn" style="flex: 1; min-width: 120px;">生成故事</button>
+                <button class="regenerate-btn" style="flex: 1; min-width: 120px;">重新生成</button>
+                <button class="nav-btn" style="flex: 1; min-width: 120px;">上一页</button>
+                <button class="nav-btn" style="flex: 1; min-width: 120px;">下一页</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">📝 输入框测试</h2>
+            <div class="test-item">
+                <span class="test-label">故事主题输入</span>
+                <input type="text" class="story-input" placeholder="请输入故事主题..." style="width: 100%;">
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">🎭 动画效果测试</h2>
+            <div class="test-item">
+                <div class="play-button" style="position: relative; display: inline-block;">
+                    <span style="color: white; font-size: 2rem;">▶️</span>
+                </div>
+                <div class="page-indicator" style="position: relative; display: inline-block; margin-left: 1rem;">
+                    第 1 页
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">📊 测试结果</h2>
+            <div id="testResults">
+                <div class="test-item">
+                    <span class="test-label">屏幕宽度</span>
+                    <div id="screenWidth">检测中...</div>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">设备类型</span>
+                    <div id="deviceType">检测中...</div>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">触摸支持</span>
+                    <div id="touchSupport">检测中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 设备信息检测
+        function detectDevice() {
+            const deviceInfo = document.getElementById('deviceInfo');
+            const screenWidth = document.getElementById('screenWidth');
+            const deviceType = document.getElementById('deviceType');
+            const touchSupport = document.getElementById('touchSupport');
+            
+            // 屏幕信息
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const pixelRatio = window.devicePixelRatio || 1;
+            
+            // 设备类型判断
+            let type = '桌面端';
+            if (width <= 360) {
+                type = '超小屏手机';
+            } else if (width <= 480) {
+                type = '小屏手机';
+            } else if (width <= 768) {
+                type = '手机';
+            } else if (width <= 1024) {
+                type = '平板';
+            }
+            
+            // 触摸支持检测
+            const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            // 更新显示
+            deviceInfo.innerHTML = `
+                屏幕尺寸: ${width} × ${height}<br>
+                像素比: ${pixelRatio}<br>
+                用户代理: ${navigator.userAgent.substring(0, 50)}...
+            `;
+            
+            screenWidth.textContent = `${width}px`;
+            deviceType.textContent = type;
+            touchSupport.textContent = hasTouch ? '支持' : '不支持';
+        }
+        
+        // 触摸反馈
+        function showTouchFeedback(element) {
+            element.style.transform = 'scale(0.95)';
+            element.style.background = '#059669';
+            
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+                element.style.background = '#10b981';
+            }, 150);
+        }
+        
+        // 页面加载完成后执行检测
+        document.addEventListener('DOMContentLoaded', () => {
+            detectDevice();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', detectDevice);
+            
+            // 监听方向变化
+            window.addEventListener('orientationchange', () => {
+                setTimeout(detectDevice, 100);
+            });
+        });
+    </script>
+</body>
+</html>

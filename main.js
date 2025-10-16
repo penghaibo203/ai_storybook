@@ -30,17 +30,27 @@ function init() {
     // 获取DOM元素
     elements.storyInput = document.getElementById('storyInput');
     elements.generateBtn = document.getElementById('generateBtn');
-    elements.storyContainer = document.getElementById('storyContainer');
-    elements.emptyState = document.getElementById('emptyState');
+    elements.storyContainer = document.getElementById('storySection'); // 修正为实际存在的ID
+    elements.emptyState = null; // 当前HTML中不存在
     elements.loadingOverlay = document.getElementById('loadingOverlay');
     elements.storyTitle = document.getElementById('storyTitle');
-    elements.storyPages = document.getElementById('storyPages');
+    elements.storyPages = document.getElementById('storyContent'); // 修正为实际存在的ID
     elements.prevBtn = document.getElementById('prevBtn');
     elements.nextBtn = document.getElementById('nextBtn');
-    elements.regenerateBtn = document.getElementById('regenerateBtn');
-    elements.currentPageSpan = document.getElementById('currentPage');
-    elements.totalPagesSpan = document.getElementById('totalPages');
-    elements.audioPlayer = document.getElementById('audioPlayer');
+    elements.regenerateBtn = null; // 当前HTML中不存在
+    elements.currentPageSpan = document.getElementById('pageIndicator'); // 修正为实际存在的ID
+    elements.totalPagesSpan = null; // 当前HTML中不存在
+    elements.audioPlayer = null; // 当前HTML中不存在，需要创建
+
+    // 创建音频播放器元素
+    if (!elements.audioPlayer) {
+        const audioElement = document.createElement('audio');
+        audioElement.id = 'audioPlayer';
+        audioElement.style.display = 'none';
+        document.body.appendChild(audioElement);
+        elements.audioPlayer = audioElement;
+        console.log('✅ 音频播放器元素已创建');
+    }
 
     // 确保加载覆盖层在初始化时是隐藏的
     if (elements.loadingOverlay) {
@@ -68,27 +78,40 @@ function init() {
 // 绑定事件
 function bindEvents() {
     // 生成故事按钮
-    elements.generateBtn.addEventListener('click', handleGenerate);
+    if (elements.generateBtn) {
+        elements.generateBtn.addEventListener('click', handleGenerate);
+    }
 
     // 输入框回车
-    elements.storyInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            handleGenerate();
-        }
-    });
+    if (elements.storyInput) {
+        elements.storyInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleGenerate();
+            }
+        });
+    }
 
     // 导航按钮
-    elements.prevBtn.addEventListener('click', handlePrevPage);
-    elements.nextBtn.addEventListener('click', handleNextPage);
+    if (elements.prevBtn) {
+        elements.prevBtn.addEventListener('click', handlePrevPage);
+    }
+    if (elements.nextBtn) {
+        elements.nextBtn.addEventListener('click', handleNextPage);
+    }
 
-    // 重新生成按钮
-    elements.regenerateBtn.addEventListener('click', handleRegenerate);
+    // 重新生成按钮（如果存在）
+    if (elements.regenerateBtn) {
+        elements.regenerateBtn.addEventListener('click', handleRegenerate);
+    }
 
     // 音频播放结束事件
-    audioPlayer.addEventListener('ended', handleAudioEnded);
+    if (audioPlayer) {
+        audioPlayer.addEventListener('ended', handleAudioEnded);
+    }
 
     // 使用事件委托处理播放按钮点击
-    elements.storyPages.addEventListener('click', (e) => {
+    if (elements.storyPages) {
+        elements.storyPages.addEventListener('click', (e) => {
         const playButton = e.target.closest('.play-button');
         if (playButton) {
             const audioUrl = playButton.dataset.audio;
@@ -115,7 +138,8 @@ function bindEvents() {
                 console.warn('⚠️ 播放按钮没有音频URL');
             }
         }
-    });
+        });
+    }
 }
 
 // 处理生成故事
@@ -266,12 +290,17 @@ function updatePageDisplay() {
     const currentPageIndex = storyRenderer.getCurrentPage();
     
     // 更新页码显示
-    elements.currentPageSpan.textContent = currentPageIndex + 1;
-    elements.totalPagesSpan.textContent = totalPages;
+    if (elements.currentPageSpan) {
+        elements.currentPageSpan.textContent = `第 ${currentPageIndex + 1} 页`;
+    }
     
     // 更新按钮状态
-    elements.prevBtn.disabled = currentPageIndex === 0;
-    elements.nextBtn.disabled = currentPageIndex === totalPages - 1;
+    if (elements.prevBtn) {
+        elements.prevBtn.disabled = currentPageIndex === 0;
+    }
+    if (elements.nextBtn) {
+        elements.nextBtn.disabled = currentPageIndex === totalPages - 1;
+    }
     
     // 停止当前音频
     stopAudio();

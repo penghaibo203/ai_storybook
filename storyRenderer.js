@@ -14,39 +14,60 @@ class StoryRenderer {
      * @param {Object} data - 故事数据
      */
     render(data) {
+        console.log('🎨 StoryRenderer.render 被调用');
+        console.log('📊 传入的数据:', data);
+        console.log('📊 container元素:', this.container);
+        
         if (!data || !data.story || !data.images) {
-            console.error('故事数据不完整');
+            console.error('❌ 故事数据不完整:', data);
             return;
         }
 
         // 保存故事数据
         this.storyData = data;
         this.currentPage = 0;
+        console.log('📊 保存的故事数据:', this.storyData);
 
         // 清空容器
         this.container.innerHTML = '';
+        console.log('🧹 容器已清空');
 
         // 只渲染第一页
         this.renderCurrentPage();
+        console.log('✅ 第一页渲染完成');
     }
 
     /**
      * 渲染当前页面
      */
     renderCurrentPage() {
-        if (!this.storyData) return;
+        console.log('📄 renderCurrentPage 被调用');
+        console.log('📊 当前页面索引:', this.currentPage);
+        console.log('📊 故事数据:', this.storyData);
+        
+        if (!this.storyData) {
+            console.error('❌ 没有故事数据');
+            return;
+        }
 
         const { story, images, voice } = this.storyData;
         const text = story[this.currentPage];
         const imageUrl = images[this.currentPage];
         const audioUrl = voice && voice[this.currentPage];
+        
+        console.log('📊 当前页面文本:', text);
+        console.log('📊 当前页面图片:', imageUrl);
+        console.log('📊 当前页面音频:', audioUrl);
 
         // 清空容器
         this.container.innerHTML = '';
+        console.log('🧹 容器已清空');
 
         // 创建当前页面
         const pageElement = this.createPage(text, imageUrl, this.currentPage, audioUrl);
+        console.log('📄 创建的页面元素:', pageElement);
         this.container.appendChild(pageElement);
+        console.log('✅ 页面元素已添加到容器');
     }
 
     /**

@@ -61,7 +61,25 @@ function init() {
     }
 
     audioPlayer = elements.audioPlayer;
-    storyRenderer = new StoryRenderer(elements.storyPages);
+    
+    // 调试：检查storyPages元素
+    console.log('🔍 检查storyPages元素:', elements.storyPages);
+    console.log('🔍 storyPages元素类型:', typeof elements.storyPages);
+    console.log('🔍 storyPages是否为null:', elements.storyPages === null);
+    
+    if (elements.storyPages) {
+        storyRenderer = new StoryRenderer(elements.storyPages);
+        console.log('✅ storyRenderer创建成功:', storyRenderer);
+    } else {
+        console.error('❌ storyPages元素不存在，无法创建storyRenderer');
+        // 尝试重新获取元素
+        const retryElement = document.getElementById('storyContent');
+        console.log('🔄 重新获取storyContent元素:', retryElement);
+        if (retryElement) {
+            storyRenderer = new StoryRenderer(retryElement);
+            console.log('✅ 使用重新获取的元素创建storyRenderer成功');
+        }
+    }
 
     // 绑定事件
     bindEvents();
@@ -230,7 +248,15 @@ function displayStory(data) {
     }
 
     // 渲染故事页面
-    storyRenderer.render(data);
+    console.log('🎨 开始渲染故事页面...');
+    console.log('📊 storyRenderer对象:', storyRenderer);
+    console.log('📊 storyRenderer.container:', storyRenderer ? storyRenderer.container : 'undefined');
+    if (storyRenderer) {
+        storyRenderer.render(data);
+        console.log('✅ 故事页面渲染完成');
+    } else {
+        console.error('❌ storyRenderer对象不存在');
+    }
 
     // 更新页面显示
     updatePageDisplay();

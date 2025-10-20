@@ -170,15 +170,24 @@ export class DataManager {
   getStats() {
     try {
       const records = this.getAllRecords();
+      const total = records.length;
+      const lastGenerated = total > 0 ? records[0].createdAt : null; // getAllRecords已按createdAt倒序
+      const thisMonth = records.filter(record => {
+        const recordDate = new Date(record.createdAt);
+        const now = new Date();
+        return recordDate.getMonth() === now.getMonth() && 
+               recordDate.getFullYear() === now.getFullYear();
+      }).length;
+      const totalPages = records.reduce((sum, record) => sum + (record.pageCount || 0), 0);
+
+      // 同时返回新旧字段，保证前端兼容
       return {
-        total: records.length,
-        thisMonth: records.filter(record => {
-          const recordDate = new Date(record.createdAt);
-          const now = new Date();
-          return recordDate.getMonth() === now.getMonth() && 
-                 recordDate.getFullYear() === now.getFullYear();
-        }).length,
-        totalPages: records.reduce((sum, record) => sum + (record.pageCount || 0), 0)
+        total,
+        thisMonth,
+        totalPages,
+        // 前端records.html期望的字段
+        totalStories: total,
+        lastGenerated
       };
     } catch (error) {
       console.error('❌ 获取统计信息失败:', error);

@@ -321,6 +321,14 @@
             gap: 1.5rem;
         }
 
+        /* 图片容器：在各端保持居中与可控高度 */
+        .story-image-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .story-image {
             max-width: 100%;
             height: auto;
@@ -569,6 +577,71 @@
                 width: 45px;
                 height: 45px;
                 font-size: 1.25rem;
+            }
+        }
+
+        /* 平板端（iPad等）优化 */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .container {
+                max-width: 720px;
+                margin: 0 auto;
+            }
+            .story-section {
+                padding: 1.75rem;
+            }
+            .story-title {
+                font-size: 1.75rem;
+            }
+            .story-image {
+                max-height: 440px;
+            }
+            .english-text {
+                font-size: 1.2rem;
+            }
+            .chinese-text {
+                font-size: 1.05rem;
+            }
+            .page-navigation {
+                gap: 1.25rem;
+            }
+        }
+
+        /* 桌面端优化（并排布局） */
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 960px;
+                margin: 0 auto;
+            }
+            .story-section {
+                padding: 2rem;
+            }
+            .story-content {
+                display: grid;
+                grid-template-columns: 1.2fr 0.8fr; /* 左图右文 */
+                align-items: start;
+                gap: 2rem;
+            }
+            .story-image {
+                max-height: 520px;
+            }
+            .story-text-container {
+                align-self: stretch;
+            }
+            .english-text {
+                font-size: 1.35rem;
+            }
+            .chinese-text {
+                font-size: 1.15rem;
+            }
+        }
+
+        /* 大屏桌面端（更宽容器与更高图片） */
+        @media (min-width: 1280px) {
+            .container {
+                max-width: 1200px;
+            }
+            .story-image {
+                max-height: 600px;
             }
         }
 

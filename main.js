@@ -23,6 +23,26 @@ const elements = {
     audioPlayer: null
 };
 
+// 滚动到故事区域并尽量让图片居中
+function scrollToStorySection() {
+    const target = elements.storyContainer || document.getElementById('storySection');
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function centerCurrentImage() {
+    if (!elements.storyPages) return;
+    const img = elements.storyPages.querySelector('.story-image');
+    if (!img) return;
+    const center = () => img.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (img.complete) {
+        center();
+    } else {
+        img.addEventListener('load', center, { once: true });
+    }
+}
+
 // 初始化
 function init() {
     console.log('🚀 初始化AI英文绘本应用...');
@@ -265,6 +285,10 @@ function displayStory(data) {
 
     // 显示装饰元素
     showDecorations();
+
+        // 渲染完成后滚动到故事区域并让图片居中
+        scrollToStorySection();
+        centerCurrentImage();
 }
 
 // 显示指定页面
@@ -306,8 +330,9 @@ function showPage(pageIndex) {
     // 停止当前音频
     stopAudio();
 
-    // 滚动到顶部
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 定位到故事区域并让图片居中
+    scrollToStorySection();
+    centerCurrentImage();
 }
 
 // 处理上一页
@@ -316,6 +341,7 @@ function handlePrevPage() {
     if (storyRenderer && storyRenderer.prevPage()) {
         currentPage = storyRenderer.getCurrentPage();
         updatePageDisplay();
+        centerCurrentImage();
     }
 }
 
@@ -325,6 +351,7 @@ function handleNextPage() {
     if (storyRenderer && storyRenderer.nextPage()) {
         currentPage = storyRenderer.getCurrentPage();
         updatePageDisplay();
+        centerCurrentImage();
     }
 }
 
@@ -351,8 +378,8 @@ function updatePageDisplay() {
     // 停止当前音频
     stopAudio();
     
-    // 滚动到顶部
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 定位到故事区域
+    scrollToStorySection();
 }
 
 // 导航页面（保留兼容性）
@@ -563,6 +590,9 @@ async function loadRecordById(recordId) {
             console.log('📚 准备显示故事数据:', currentStoryData);
             displayStory(currentStoryData);
             showNotification(`已加载历史绘本: ${record.title}`, 'success');
+        // 查看故事后定位到展示区域并居中图片
+        scrollToStorySection();
+        centerCurrentImage();
         } else {
             throw new Error(result.error || '加载记录失败');
         }

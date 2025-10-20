@@ -7,6 +7,14 @@ class StoryRenderer {
         this.container = container;
         this.currentPage = 0;
         this.storyData = null;
+        this.initialized = false;
+        this.refs = {
+            pageIndicator: null,
+            image: null,
+            playButton: null,
+            english: null,
+            chinese: null
+        };
     }
 
     /**
@@ -28,46 +36,95 @@ class StoryRenderer {
         this.currentPage = 0;
         console.log('📊 保存的故事数据:', this.storyData);
 
-        // 清空容器
-        this.container.innerHTML = '';
-        console.log('🧹 容器已清空');
+        // 若未初始化，创建一次静态骨架
+        if (!this.initialized) {
+            this.buildPageSkeleton();
+            this.initialized = true;
+        }
 
-        // 只渲染第一页
-        this.renderCurrentPage();
-        console.log('✅ 第一页渲染完成');
+        // 更新到第一页内容
+        this.updatePageContent();
+        console.log('✅ 第一页渲染完成（无整页刷新，仅内容切换）');
     }
 
     /**
      * 渲染当前页面
      */
     renderCurrentPage() {
-        console.log('📄 renderCurrentPage 被调用');
-        console.log('📊 当前页面索引:', this.currentPage);
-        console.log('📊 故事数据:', this.storyData);
-        
-        if (!this.storyData) {
-            console.error('❌ 没有故事数据');
-            return;
-        }
+        // 兼容旧接口：改为仅更新内容
+        this.updatePageContent();
+    }
+
+    /**
+     * 创建一次性的页面骨架（只创建DOM结构，不含具体内容）
+     */
+    buildPageSkeleton() {
+        this.container.innerHTML = '';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'story-page';
+        wrapper.dataset.page = '0';
+
+        wrapper.innerHTML = `
+            <div class="page-indicator">📖 第 1 页</div>
+            <div class="story-image-container">
+                <img class="story-image" alt="Story illustration" loading="lazy">
+            </div>
+            <div class="story-text-container">
+                <div class="play-button" title="播放音频">▶️</div>
+                <div class="english-text"></div>
+                <div class="chinese-text"></div>
+            </div>
+        `;
+
+        this.container.appendChild(wrapper);
+
+        // 保存引用，后续只更新内容
+        this.refs.pageIndicator = wrapper.querySelector('.page-indicator');
+        this.refs.image = wrapper.querySelector('.story-image');
+        this.refs.playButton = wrapper.querySelector('.play-button');
+        this.refs.english = wrapper.querySelector('.english-text');
+        this.refs.chinese = wrapper.querySelector('.chinese-text');
+    }
+
+    /**
+     * 根据当前页数据更新DOM内容（不重建结构）
+     */
+    updatePageContent() {
+        if (!this.storyData) return;
 
         const { story, images, voice } = this.storyData;
         const text = story[this.currentPage];
         const imageUrl = images[this.currentPage];
         const audioUrl = voice && voice[this.currentPage];
-        
-        console.log('📊 当前页面文本:', text);
-        console.log('📊 当前页面图片:', imageUrl);
-        console.log('📊 当前页面音频:', audioUrl);
 
-        // 清空容器
-        this.container.innerHTML = '';
-        console.log('🧹 容器已清空');
+        const { english, chinese } = this.parseText(text);
 
-        // 创建当前页面
-        const pageElement = this.createPage(text, imageUrl, this.currentPage, audioUrl);
-        console.log('📄 创建的页面元素:', pageElement);
-        this.container.appendChild(pageElement);
-        console.log('✅ 页面元素已添加到容器');
+        if (this.refs.image) {
+            this.refs.image.src = imageUrl || '';
+            this.refs.image.alt = `Story illustration ${this.currentPage + 1}`;
+        }
+
+        if (this.refs.english) {
+            this.refs.english.textContent = english || '';
+        }
+        if (this.refs.chinese) {
+            this.refs.chinese.textContent = chinese || '';
+        }
+
+        if (this.refs.playButton) {
+            if (audioUrl) {
+                this.refs.playButton.dataset.audio = audioUrl;
+                this.refs.playButton.style.display = '';
+            } else {
+                // 无音频则清空data并隐藏按钮（不移除，保持结构稳定）
+                delete this.refs.playButton.dataset.audio;
+                this.refs.playButton.style.display = 'none';
+            }
+        }
+
+        if (this.refs.pageIndicator) {
+            this.refs.pageIndicator.textContent = `📖 第 ${this.currentPage + 1} 页`;
+        }
     }
 
     /**
@@ -78,7 +135,7 @@ class StoryRenderer {
         
         if (this.currentPage < this.storyData.story.length - 1) {
             this.currentPage++;
-            this.renderCurrentPage();
+            this.updatePageContent();
             return true;
         }
         return false;
@@ -92,7 +149,7 @@ class StoryRenderer {
         
         if (this.currentPage > 0) {
             this.currentPage--;
-            this.renderCurrentPage();
+            this.updatePageContent();
             return true;
         }
         return false;
@@ -107,7 +164,7 @@ class StoryRenderer {
         
         if (pageIndex >= 0 && pageIndex < this.storyData.story.length) {
             this.currentPage = pageIndex;
-            this.renderCurrentPage();
+            this.updatePageContent();
             return true;
         }
         return false;

@@ -237,6 +237,8 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             display: none;
+            margin-left: auto; /* 水平居中容器 */
+            margin-right: auto; /* 水平居中容器 */
         }
 
         .story-section.show {
@@ -620,6 +622,7 @@
                 grid-template-columns: 1.2fr 0.8fr; /* 左图右文 */
                 align-items: start;
                 gap: 2rem;
+                justify-items: center; /* 网格项水平居中 */
             }
             .story-image {
                 max-height: 520px;

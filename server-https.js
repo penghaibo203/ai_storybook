@@ -95,6 +95,13 @@ app.use('/css', express.static(path.join(__dirname, 'public', 'css'), {
   lastModified: false
 }));
 
+// 整个public目录的静态文件服务
+app.use('/public', express.static(path.join(__dirname, 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0',
+  etag: true,
+  lastModified: true
+}));
+
 // favicon服务
 app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'favicon.ico'), {
   maxAge: process.env.NODE_ENV === 'production' ? '1y' : '0',

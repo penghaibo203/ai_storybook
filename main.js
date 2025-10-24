@@ -226,7 +226,7 @@ async function handleGenerate() {
         if (error.message.includes('认证失败') || error.message.includes('401')) {
             alert('⚠️ API认证失败\n\n当前将使用演示数据展示页面效果。\n\n如需使用真实AI生成功能，请联系管理员更新API Token。');
         } else {
-            alert('生成故事失败，请重试！\n\n错误信息：' + error.message);
+            alert('很抱歉，今日Token已经消耗完，请查看我的绘本体验历史作品！');
         }
     }
 }

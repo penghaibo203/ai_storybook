@@ -147,11 +147,29 @@ app.post('/api/generate-story', async (req, res) => {
     }
     
   } catch (error) {
-    console.error('生成故事API错误:', error);
+    console.error('❌ 生成故事API错误:', error);
+    console.error('错误堆栈:', error.stack);
     
-    res.status(500).json({
+    // 根据错误类型返回不同的状态码和错误信息
+    let statusCode = 500;
+    let errorMessage = error.message || '服务器内部错误';
+    
+    // 认证错误
+    if (error.message?.includes('API认证失败') || error.message?.includes('Token')) {
+      statusCode = 401;
+    }
+    // 权限错误
+    else if (error.message?.includes('权限不足')) {
+      statusCode = 403;
+    }
+    // 资源不存在
+    else if (error.message?.includes('不存在') || error.message?.includes('404')) {
+      statusCode = 404;
+    }
+    
+    res.status(statusCode).json({
       success: false,
-      error: error.message || '生成故事失败，请重试'
+      error: errorMessage
     });
   }
 });

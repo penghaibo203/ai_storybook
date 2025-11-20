@@ -9,11 +9,22 @@ const API_CONFIG = {
     timeout: 60000 // 60秒超时
 };
 
-// 创建Coze API客户端
-const apiClient = new CozeAPI({
-    token: API_CONFIG.token,
-    baseURL: API_CONFIG.baseURL
-});
+// 验证Token配置
+function validateToken() {
+    if (!API_CONFIG.token || API_CONFIG.token === 'your_coze_api_token_here') {
+        throw new Error('API认证失败：未配置有效的Coze API Token。请在环境变量中设置 COZE_API_TOKEN，或创建 .env 文件并配置 Token。');
+    }
+    return true;
+}
+
+// 创建Coze API客户端（延迟创建，确保环境变量已加载）
+function getApiClient() {
+    validateToken();
+    return new CozeAPI({
+        token: API_CONFIG.token,
+        baseURL: API_CONFIG.baseURL
+    });
+}
 
 /**
  * 生成故事
@@ -22,10 +33,17 @@ const apiClient = new CozeAPI({
  */
 export async function generateStory(input) {
     try {
+        // 验证Token
+        validateToken();
+        
+        // 获取API客户端
+        const apiClient = getApiClient();
+        
         console.log('🚀 开始调用Coze API生成故事...');
         console.log('📝 输入主题:', input);
         console.log('🔑 使用Token:', API_CONFIG.token.substring(0, 20) + '...');
         console.log('🆔 Workflow ID:', API_CONFIG.workflowId);
+        console.log('🌐 Base URL:', API_CONFIG.baseURL);
 
         // 使用官方SDK调用workflow
         const res = await apiClient.workflows.runs.stream({
@@ -84,11 +102,37 @@ export async function generateStory(input) {
 
     } catch (error) {
         console.error('❌ API调用错误:', error);
+        console.error('错误详情:', {
+            message: error.message,
+            code: error.code,
+            status: error.status,
+            response: error.response
+        });
+        
+        // 检查是否是Token配置问题
+        if (error.message?.includes('未配置有效的Coze API Token')) {
+            throw error;
+        }
         
         // 如果是认证错误，抛出明确的错误信息
-        if (error.message?.includes('authentication') || error.message?.includes('401') || error.message?.includes('logid')) {
+        if (error.message?.includes('authentication') || 
+            error.message?.includes('401') || 
+            error.message?.includes('Unauthorized') ||
+            error.message?.includes('logid') ||
+            error.status === 401 ||
+            (error.response && error.response.status === 401)) {
             console.warn('🔐 API认证失败，请检查Token是否有效');
-            throw new Error('API认证失败：Token可能无效或已过期。请检查Coze API Token配置。');
+            throw new Error('API认证失败：Token可能无效或已过期。请检查环境变量 COZE_API_TOKEN 是否正确配置。');
+        }
+        
+        // 如果是403错误，可能是权限问题
+        if (error.status === 403 || (error.response && error.response.status === 403)) {
+            throw new Error('API权限不足：请检查Token是否有访问该Workflow的权限。');
+        }
+        
+        // 如果是404错误，可能是Workflow ID错误
+        if (error.status === 404 || (error.response && error.response.status === 404)) {
+            throw new Error('Workflow不存在：请检查环境变量 COZE_WORKFLOW_ID 是否正确。');
         }
         
         throw error; // 其他错误直接抛出

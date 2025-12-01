@@ -82,3 +82,4 @@ hypersmart.work_nginx/*.crt
 hypersmart.work_nginx/*.csr
 hypersmart.work_nginx/*.p12
 hypersmart.work_nginx/*.pfx
+.ftp

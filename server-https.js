@@ -8,6 +8,7 @@ import https from 'https';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dataManager } from './dataManager.js';
+import { resourceManager } from './resourceManager.js';
 
 // ES模块中获取__dirname的替代方案
 const __filename = fileURLToPath(import.meta.url);
@@ -142,23 +143,36 @@ app.post('/api/generate-story', async (req, res) => {
     
     const storyData = await generateStory(input);
     
-    console.log('✅ 故事生成成功');
+    console.log('✅ 故事生成成功，开始下载资源到本地...');
+    
+    // 生成记录ID
+    const recordId = dataManager.generateId();
+    
+    // 下载并保存资源到本地
+    let processedStoryData = storyData;
+    try {
+        processedStoryData = await resourceManager.saveStoryResources(recordId, storyData);
+        console.log('✅ 资源下载完成');
+    } catch (resourceError) {
+        console.error('⚠️ 资源下载部分失败，将使用原始URL:', resourceError);
+    }
     
     // 保存绘本记录
     try {
-      const savedRecord = dataManager.saveRecord(storyData, input);
+      // 传入处理后的数据和预生成的ID
+      const savedRecord = dataManager.saveRecord(processedStoryData, input, recordId);
       console.log('💾 绘本记录已保存:', savedRecord.id);
       
       res.json({
         success: true,
-        data: storyData,
+        data: processedStoryData,
         recordId: savedRecord.id
       });
     } catch (saveError) {
       console.error('⚠️ 保存绘本记录失败，但故事生成成功:', saveError);
       res.json({
         success: true,
-        data: storyData,
+        data: processedStoryData,
         warning: '故事生成成功，但保存记录失败'
       });
     }

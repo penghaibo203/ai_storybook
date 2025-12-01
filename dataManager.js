@@ -65,14 +65,15 @@ export class DataManager {
    * 保存新的绘本记录
    * @param {Object} storyData - 故事数据
    * @param {string} input - 用户输入的主题
+   * @param {string} [existingId] - 可选，预先生成的ID
    * @returns {Object} 保存的记录信息
    */
-  saveRecord(storyData, input) {
+  saveRecord(storyData, input, existingId = null) {
     try {
       const records = this.getAllRecords();
       
-      // 生成唯一ID
-      const id = this.generateId();
+      // 使用现有ID或生成新ID
+      const id = existingId || this.generateId();
       
       // 创建记录对象
       const record = {
